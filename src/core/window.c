@@ -9,6 +9,7 @@
 SDL_Event event;
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
+TTF_Font *font = NULL;
 
 
 int init_window(void) {
@@ -30,6 +31,15 @@ int init_window(void) {
     }
 
     TTF_Init();
+
+    TTF_Font *font = TTF_OpenFont(
+        "./assets/fonts/Roboto.ttf",
+        18.0f
+    );
+
+    if (font == NULL) {
+        SDL_Log("Failed to load font: %s", SDL_GetError());
+    }
 
     return 0;
 }
@@ -54,14 +64,7 @@ void render_loop(void) {
 
     Coordinates ship_position = {500.0f, 250.0f};
 
-    TTF_Font *font = TTF_OpenFont(
-        "./assets/fonts/Roboto.ttf",
-        18.0f
-    );
 
-    if (font == NULL) {
-        SDL_Log("Failed to load font: %s", SDL_GetError());
-    }
 
     render_ship(renderer, ship_position);
 

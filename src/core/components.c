@@ -14,8 +14,8 @@ const NoseProperties noses[] = {
 
 const BodyProperties bodies[] = {
     [BODY_LIGHTWEIGHT] = {
-        .mass = 1000.0f,
-        .fuel_storage = 850.0f 
+        .mass = 40000.0f,
+        .fuel_storage = 2000.0f 
     },
 
     [BODY_STANDARD] = {
@@ -27,8 +27,8 @@ const BodyProperties bodies[] = {
 const ThrusterProperties thrusters[] = {
     [THRUSTER_EFFICIENT] = {
         .mass = 250.0f,
-        .thrust = 7000.0f,
-        .propellant_flow_rate = 20.0f 
+        .thrust = 750000.0f,
+        .propellant_flow_rate = 2.0f 
     },
 
     [THRUSTER_FAST] = {

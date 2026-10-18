@@ -7,8 +7,8 @@ void init_gamestate(void) {
     gameState.shipParams.position.x = 0;
     gameState.shipParams.position.y = 0; 
 
-    gameState.shipParams.realPosition.x = 10000000.0f;
-    gameState.shipParams.realPosition.y = 10000000.0f; 
+    gameState.shipParams.realPosition.x = 0.0f;
+    gameState.shipParams.realPosition.y = 0.0f; 
 
 
     gameState.shipParams.speed.x = 0;
@@ -32,7 +32,7 @@ void init_gamestate(void) {
 
 void get_component_properties(void) {
     gameState.shipParams.mass += get_nose_properties(gameState.shipComponents.nose).mass;
-    
+
     gameState.shipParams.mass += get_body_properties(gameState.shipComponents.body).mass;
     gameState.shipParams.mass += get_thruster_properties(gameState.shipComponents.thruster).mass;
 

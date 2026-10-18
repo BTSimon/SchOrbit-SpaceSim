@@ -55,8 +55,17 @@ void physics_loop(void) {
     Vector current_g = calculate_gravity(gameState.shipParams.realPosition.y);
 
     //calculate thrust 
-    Vector current_thrust = calculate_thrust(gameState.shipParams.thrust, gameState.shipParams.mass);
 
+    Vector current_thrust = {
+            .x = 0,
+            .y = 0
+    };
+
+    if (gameState.shipParams.fuel - gameState.shipParams.propellant_flow_rate > 0) {
+        current_thrust = calculate_thrust(gameState.shipParams.thrust, gameState.shipParams.mass);
+        gameState.shipParams.fuel -= gameState.shipParams.propellant_flow_rate;
+    }
+    printf("Ship fuel: %.2f\n", gameState.shipParams.fuel);
     net_acceleration = calculate_acceleration(current_g, current_thrust);
 
 
@@ -67,6 +76,12 @@ void physics_loop(void) {
     *acc = net_acceleration;
     *pos = calculate_position(*pos, *speed, net_acceleration, DELTA_T);
     *speed = calculate_speed(*speed, net_acceleration, DELTA_T);
+
+    if (pos->y <= 0) {
+        pos->y = 0; 
+        speed->y = 0;
+    }
+
 
     printf("Altitude: %.2f\n", gameState.shipParams.realPosition.y);
     printf("Speed: %.2f\n", gameState.shipParams.speed.y);
