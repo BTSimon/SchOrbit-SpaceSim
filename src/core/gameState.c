@@ -1,4 +1,5 @@
 #include "../../headers/gameState.h"
+#include <stdio.h> 
 
 GameState gameState;
 
@@ -31,6 +32,7 @@ void init_gamestate(void) {
 
 void get_component_properties(void) {
     gameState.shipParams.mass += get_nose_properties(gameState.shipComponents.nose).mass;
+    
     gameState.shipParams.mass += get_body_properties(gameState.shipComponents.body).mass;
     gameState.shipParams.mass += get_thruster_properties(gameState.shipComponents.thruster).mass;
 

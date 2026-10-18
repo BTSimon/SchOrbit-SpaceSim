@@ -78,7 +78,7 @@ void render_loop(void) {
 
     char text[128];
 
-    snprintf(text, sizeof(text), "Altitude: %.2f m", gameState.shipParams.realPosition.y);
+    snprintf(text, sizeof(text), "Altitude: %.2f m", gameState.shipParams.acceleration.y);
 
     render_text(
         renderer,

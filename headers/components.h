@@ -17,19 +17,19 @@ typedef enum {
 } ThrusterType;
 
 typedef struct {
-    int mass;
+    float mass;
     float drag_coefficient;
 } NoseProperties;
 
 typedef struct {
-    int mass;
-    int fuel_storage;
+    float mass;
+    float fuel_storage;
 } BodyProperties;
 
 typedef struct {
-    int mass;
-    int thrust; 
-    int propellant_flow_rate;
+    float mass;
+    float thrust; 
+    float propellant_flow_rate;
 } ThrusterProperties;
 
 NoseProperties get_nose_properties(NoseType nose);

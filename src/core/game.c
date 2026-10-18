@@ -5,6 +5,7 @@
 
 void init_game(void) {
     init_gamestate();
+    get_component_properties();
 }
 
 void game_loop(void) {

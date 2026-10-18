@@ -22,11 +22,11 @@ typedef struct {
     Vector acceleration;
     Vector speed;
 
-    int mass;
+    float mass;
     float drag_coefficient;
-    int thrust;
-    int fuel;
-    int propellant_flow_rate;
+    float thrust;
+    float fuel;
+    float propellant_flow_rate;
 
 } ShipParams;
 

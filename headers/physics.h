@@ -9,7 +9,7 @@
 #define EARTH_RADIUS 6321000 
 #define EARTH_MASS 5.972 * pow(10, 24)
 
-#define DELTA_T PHYSICS_TIMESCALE * 60
+#define DELTA_T 1.0f
 
 void physics_loop(void);
 
