@@ -2,7 +2,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 
-#include "../../headers/gameState.h"
+#include "../../headers/game_state.h"
 #include "../../headers/graphics.h"
 #include "../../headers/main.h"
 
@@ -32,13 +32,14 @@ int init_window(void) {
 
     TTF_Init();
 
-    TTF_Font *font = TTF_OpenFont(
+    font = TTF_OpenFont(
         "./assets/fonts/Roboto.ttf",
         18.0f
     );
 
     if (font == NULL) {
         SDL_Log("Failed to load font: %s", SDL_GetError());
+        return 500;
     }
 
     return 0;
@@ -56,6 +57,9 @@ void render_loop(void) {
         if (event.type == SDL_EVENT_QUIT) {
             quit_game();
             exit_window();
+        } elif (event.type == SDL_EVENT_KEY_DOWN) {
+            //manage input
+            continue;
         }
     }
 

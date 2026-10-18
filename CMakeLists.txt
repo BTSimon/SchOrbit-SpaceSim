@@ -12,13 +12,15 @@ find_package(SDL3_ttf CONFIG REQUIRED)
 
 add_executable(orbit
     src/main.c
-    src/core/window.c
-    src/core/assets.c
-    src/core/graphics.c
-    src/core/gameState.c
-    src/core/physics.c
-    src/core/game.c
-    src/core/components.c
+    src/app/game_state.c
+    src/app/game.c
+
+    src/platform/window.c
+    src/platform/assets.c
+    src/render/graphics.c
+    
+    src/simulation/physics.c
+    src/simulation/components.c
 )
 
 target_link_libraries(orbit PRIVATE 

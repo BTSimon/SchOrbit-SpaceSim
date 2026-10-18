@@ -1,5 +1,5 @@
 #include "../../headers/physics.h"
-#include "../../headers/gamestate.h"
+#include "../../headers/game_state.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -49,6 +49,9 @@ Vector calculate_thrust(float thrust, float mass) {
 }
 
 void physics_loop(void) {
+
+    gameState.shipParams.elapsed_time += DELTA_T;
+
     Vector net_acceleration;
 
     // calculate g 
@@ -57,8 +60,8 @@ void physics_loop(void) {
     //calculate thrust 
 
     Vector current_thrust = {
-            .x = 0,
-            .y = 0
+        .x = 0,
+        .y = 0
     };
 
     if (gameState.shipParams.fuel - gameState.shipParams.propellant_flow_rate > 0) {
@@ -82,8 +85,8 @@ void physics_loop(void) {
         speed->y = 0;
     }
 
-
+    printf("Timestamp: %.2f\n", gameState.shipParams.elapsed_time);
     printf("Altitude: %.2f\n", gameState.shipParams.realPosition.y);
     printf("Speed: %.2f\n", gameState.shipParams.speed.y);
-    printf("acc: %.2f\n", net_acceleration.y);
+    printf("acc: %.2f\n\n", net_acceleration.y);
 }

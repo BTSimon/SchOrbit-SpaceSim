@@ -28,6 +28,8 @@ typedef struct {
     float fuel;
     float propellant_flow_rate;
 
+    float elapsed_time;
+
 } ShipParams;
 
 typedef struct {

@@ -1,6 +1,6 @@
 #include "../../headers/window.h"
 #include "../../headers/physics.h"
-#include "../../headers/gameState.h"
+#include "../../headers/game_state.h"
 #include <SDL3/SDL.h>
 
 void init_game(void) {

@@ -1,4 +1,4 @@
-#include "../../headers/gameState.h"
+#include "../../headers/game_state.h"
 #include <stdio.h> 
 
 GameState gameState;
@@ -9,6 +9,8 @@ void init_gamestate(void) {
 
     gameState.shipParams.realPosition.x = 0.0f;
     gameState.shipParams.realPosition.y = 0.0f; 
+
+    gameState.shipParams.elapsed_time = 0;
 
 
     gameState.shipParams.speed.x = 0;
