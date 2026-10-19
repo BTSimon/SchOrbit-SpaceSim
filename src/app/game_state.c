@@ -7,8 +7,8 @@ void init_gamestate(void) {
     gameState.shipParams.position.x = 0;
     gameState.shipParams.position.y = 0; 
 
-    gameState.shipParams.realPosition.x = 0.0f;
-    gameState.shipParams.realPosition.y = 0.0f; 
+    gameState.shipParams.realPosition.x = 0;
+    gameState.shipParams.realPosition.y = 0; 
 
     gameState.shipParams.elapsed_time = 0;
 
@@ -26,7 +26,7 @@ void init_gamestate(void) {
     gameState.shipComponents.thruster = THRUSTER_EFFICIENT;
 
     gameState.shipParams.mass = 0;
-    gameState.shipParams.drag_coefficient = 0;
+
     gameState.shipParams.fuel = 0;
     gameState.shipParams.thrust = 0;
     gameState.shipParams.propellant_flow_rate = 0;
@@ -38,7 +38,8 @@ void get_component_properties(void) {
     gameState.shipParams.mass += get_body_properties(gameState.shipComponents.body).mass;
     gameState.shipParams.mass += get_thruster_properties(gameState.shipComponents.thruster).mass;
 
-    gameState.shipParams.drag_coefficient += get_nose_properties(gameState.shipComponents.nose).drag_coefficient;
+    gameState.shipParams.all_drag.drag_up = get_nose_properties(gameState.shipComponents.nose).drag_properties;
+    gameState.shipParams.all_drag.drag_down = get_nose_properties(gameState.shipComponents.thruster).drag_properties;
 
     gameState.shipParams.fuel += get_body_properties(gameState.shipComponents.body).fuel_storage;
 

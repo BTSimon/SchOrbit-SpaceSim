@@ -2,39 +2,53 @@
 
 const NoseProperties noses[] = {
     [NOSE_SHARP] = {
-        .mass = 60.0f,
-        .drag_coefficient = 0.2f 
+        .mass = 2,
+        .drag_properties = {
+            .area = 0.05,
+            .drag_coefficient = 0.3
+        }
     },
 
     [NOSE_STANDARD] = {
-        .mass = 100.0f,
-        .drag_coefficient = 0.4f
+        .mass = 100.0,
+        .drag_properties = {
+            .area = 8,
+            .drag_coefficient = 0.4
+        }
     }
 };
 
 const BodyProperties bodies[] = {
     [BODY_LIGHTWEIGHT] = {
-        .mass = 40000.0f,
-        .fuel_storage = 2000.0f 
+        .mass = 65,
+        .fuel_storage = 40 
     },
 
     [BODY_STANDARD] = {
-        .mass = 1400.0f,
-        .fuel_storage = 1300.0f
+        .mass = 1400.0,
+        .fuel_storage = 1300.0
     }
 };
 
 const ThrusterProperties thrusters[] = {
     [THRUSTER_EFFICIENT] = {
-        .mass = 250.0f,
-        .thrust = 750000.0f,
-        .propellant_flow_rate = 2.0f 
+        .mass = 8,
+        .thrust = 5000,
+        .propellant_flow_rate = 2.0,
+        .drag_properties = {
+            .area = 0.05,
+            .drag_coefficient = 0.8
+        }
     },
 
     [THRUSTER_FAST] = {
-        .mass = 300.0f,
-        .thrust = 1800.0f,
-        .propellant_flow_rate = 40.0f
+        .mass = 300.0,
+        .thrust = 1800.0,
+        .propellant_flow_rate = 40.0,
+        .drag_properties = {
+            .area = 10,
+            .drag_coefficient = 0.8
+        }
     }
 };
 

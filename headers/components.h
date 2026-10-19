@@ -1,6 +1,11 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
+typedef struct {
+    double drag_coefficient;
+    double area;
+} Drag;
+
 typedef enum {
     NOSE_STANDARD,
     NOSE_SHARP
@@ -17,19 +22,20 @@ typedef enum {
 } ThrusterType;
 
 typedef struct {
-    float mass;
-    float drag_coefficient;
+    double mass;
+    Drag drag_properties;
 } NoseProperties;
 
 typedef struct {
-    float mass;
-    float fuel_storage;
+    double mass;
+    double fuel_storage;
 } BodyProperties;
 
 typedef struct {
-    float mass;
-    float thrust; 
-    float propellant_flow_rate;
+    double mass;
+    double thrust; 
+    double propellant_flow_rate;
+    Drag drag_properties;
 } ThrusterProperties;
 
 NoseProperties get_nose_properties(NoseType nose);

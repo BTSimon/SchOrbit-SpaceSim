@@ -9,6 +9,12 @@ typedef enum {
     GAME_MODE_TEST
 } GameMode;
 
+
+typedef struct {
+    Drag drag_up;
+    Drag drag_down;
+} DragCoefficients;
+
 typedef struct {
     NoseType nose;
     BodyType body;
@@ -22,13 +28,15 @@ typedef struct {
     Vector acceleration;
     Vector speed;
 
-    float mass;
-    float drag_coefficient;
-    float thrust;
-    float fuel;
-    float propellant_flow_rate;
+    double mass;
+    
+    DragCoefficients all_drag;
 
-    float elapsed_time;
+    double thrust;
+    double fuel;
+    double propellant_flow_rate;
+
+    double elapsed_time;
 
 } ShipParams;
 

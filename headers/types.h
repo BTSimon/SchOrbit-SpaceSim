@@ -2,13 +2,13 @@
 #define TYPES_H
 
 typedef struct {
-    float x;
-    float y;
+    double x;
+    double y;
 } Coordinates;
 
 typedef struct {
-    float x;
-    float y;
+    double x;
+    double y;
 } Vector;
 
 #endif
