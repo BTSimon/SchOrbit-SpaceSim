@@ -14,6 +14,7 @@ add_executable(orbit
     src/main.c
     src/app/game_state.c
     src/app/game.c
+    src/app/event_handler.c
 
     src/platform/window.c
     src/platform/assets.c
@@ -21,6 +22,8 @@ add_executable(orbit
     
     src/simulation/physics.c
     src/simulation/components.c
+
+    src/ui/ui.c
 )
 
 target_link_libraries(orbit PRIVATE 
