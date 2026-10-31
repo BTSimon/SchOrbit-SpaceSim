@@ -241,7 +241,13 @@ void render_frame(SDL_Renderer *renderer, TTF_Font *font) {
 
     switch (gameState.gameMode) {
         case GAME_MODE_DESIGN:
-            render_design_window(renderer, font, ship_position);
+            render_design_window(
+                renderer,
+                font,
+                ship_position,
+                output_width,
+                output_height
+            );
             break;
         case GAME_MODE_TEST:
             render_test_window(

@@ -6,7 +6,9 @@
 void render_design_window(
     SDL_Renderer *renderer,
     TTF_Font *font,
-    Coordinates ship_position
+    Coordinates ship_position,
+    int width,
+    int height
 );
 
 void render_test_window(
