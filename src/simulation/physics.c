@@ -2,7 +2,6 @@
 #include "../../headers/game_state.h"
 
 #include <math.h>
-#include <stdio.h>
 
 Vector calculate_gravity(double distance_from_earth) {
     Vector g_force;
@@ -60,53 +59,54 @@ Vector calculate_drag_acceleration(Vector velocity, Drag drag_prop, Coordinates 
     return drag;
 }
 
-void physics_loop(void) {
-
-    gameState.shipParams.elapsed_time += DELTA_T;
-
-    Vector net_acceleration;
-
-    // calculate g 
-    Vector current_g = calculate_gravity(gameState.shipParams.realPosition.y);
-
-    //calculate thrust 
-
-    Vector current_thrust = {
-        .x = 0,
-        .y = 0
-    };
-
-    Vector *acc = &gameState.shipParams.acceleration;
-    Vector *speed = &gameState.shipParams.speed;
-    Coordinates *pos = &gameState.shipParams.realPosition;
-
-    Vector drag_acc;
-
-    if (speed->y < 0) {
-        drag_acc = calculate_drag_acceleration(*speed, gameState.shipParams.all_drag.drag_down, *pos, gameState.shipParams.mass);
-    } else {
-        drag_acc = calculate_drag_acceleration(*speed, gameState.shipParams.all_drag.drag_up, *pos, gameState.shipParams.mass);
+void physics_loop(double delta_time) {
+    if (delta_time <= 0.0) {
+        return;
     }
 
-    if (gameState.shipParams.fuel - gameState.shipParams.propellant_flow_rate >= 0) {
-        current_thrust = calculate_thrust(gameState.shipParams.thrust, gameState.shipParams.mass);
-        gameState.shipParams.fuel -= gameState.shipParams.propellant_flow_rate;
+    if (!gameState.paused) {
+        gameState.shipParams.elapsed_time += delta_time;
+    
+        Vector net_acceleration;
+    
+        // calculate g 
+        Vector current_g = calculate_gravity(gameState.shipParams.realPosition.y);
+    
+        //calculate thrust 
+    
+        Vector current_thrust = {
+            .x = 0,
+            .y = 0
+        };
+    
+        Vector *acc = &gameState.shipParams.acceleration;
+        Vector *speed = &gameState.shipParams.speed;
+        Coordinates *pos = &gameState.shipParams.realPosition;
+    
+        Vector drag_acc;
+    
+        if (speed->y < 0) {
+            drag_acc = calculate_drag_acceleration(*speed, gameState.shipParams.all_drag.drag_down, *pos, gameState.shipParams.mass);
+        } else {
+            drag_acc = calculate_drag_acceleration(*speed, gameState.shipParams.all_drag.drag_up, *pos, gameState.shipParams.mass);
+        }
+    
+        if (gameState.shipParams.fuel - gameState.shipParams.propellant_flow_rate * delta_time >= 0) {
+            current_thrust = calculate_thrust(gameState.shipParams.thrust, gameState.shipParams.mass);
+            gameState.shipParams.fuel -= gameState.shipParams.propellant_flow_rate * delta_time;
+            gameState.shipParams.mass -= gameState.shipParams.propellant_flow_rate * delta_time;
+        }
+        net_acceleration = calculate_acceleration(calculate_acceleration(current_g, current_thrust), drag_acc);
+    
+        *acc = net_acceleration;
+        *pos = calculate_position(*pos, *speed, net_acceleration, delta_time);
+        *speed = calculate_speed(*speed, net_acceleration, delta_time);
+    
+        if (pos->y <= 0) {
+            pos->y = 0; 
+            speed->y = 0;
+        }
+    
     }
-    printf("Ship fuel: %.2f\n", gameState.shipParams.fuel);
-    printf("Drag acceleration: %.2f\n", drag_acc.y);
-    net_acceleration = calculate_acceleration(calculate_acceleration(current_g, current_thrust), drag_acc);
 
-    *acc = net_acceleration;
-    *pos = calculate_position(*pos, *speed, net_acceleration, DELTA_T);
-    *speed = calculate_speed(*speed, net_acceleration, DELTA_T);
-
-    if (pos->y <= 0) {
-        pos->y = 0; 
-        speed->y = 0;
-    }
-
-    printf("Timestamp: %.2f\n", gameState.shipParams.elapsed_time);
-    printf("Altitude: %.2f\n", gameState.shipParams.realPosition.y);
-    printf("Speed: %.2f\n", gameState.shipParams.speed.y);
-    printf("acc: %.2f\n\n", net_acceleration.y);
 }

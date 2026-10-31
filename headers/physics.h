@@ -2,7 +2,6 @@
 #define PHYSICS_H
 
 #include "./types.h"
-#include "./game.h"
 
 
 #define GRAV_CONST 6.674 * pow(10, -11)
@@ -12,8 +11,8 @@
 #define EULER 2.718281828
 #define AIR_PRESSURE_0 1.225
 
-#define DELTA_T 0.2f
+#define PHYSICS_STEP_SECONDS 0.1
 
-void physics_loop(void);
+void physics_loop(double delta_time);
 
 #endif

@@ -20,8 +20,8 @@ const NoseProperties noses[] = {
 
 const BodyProperties bodies[] = {
     [BODY_LIGHTWEIGHT] = {
-        .mass = 65,
-        .fuel_storage = 40 
+        .mass = 450,
+        .fuel_storage = 200
     },
 
     [BODY_STANDARD] = {

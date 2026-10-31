@@ -19,7 +19,7 @@ void init_gamestate(void) {
     gameState.shipParams.acceleration.x = 0;
     gameState.shipParams.acceleration.y = 0;
 
-    gameState.gameMode = GAME_MODE_DESIGN;
+    gameState.gameMode = GAME_MODE_TEST;
 
     gameState.shipComponents.nose = NOSE_SHARP;
     gameState.shipComponents.body = BODY_LIGHTWEIGHT;
@@ -30,6 +30,9 @@ void init_gamestate(void) {
     gameState.shipParams.fuel = 0;
     gameState.shipParams.thrust = 0;
     gameState.shipParams.propellant_flow_rate = 0;
+
+    gameState.paused = false;
+    gameState.thrust_level = 0.0;
 }
 
 void get_component_properties(void) {

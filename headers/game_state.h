@@ -3,10 +3,12 @@
 
 #include "./types.h"
 #include "./components.h"
+#include <stdbool.h>
 
 typedef enum {
     GAME_MODE_DESIGN,
-    GAME_MODE_TEST
+    GAME_MODE_TEST,
+    GAME_MODE_STATISTICS
 } GameMode;
 
 
@@ -44,6 +46,9 @@ typedef struct {
     GameMode gameMode;
     ShipParams shipParams;
     ShipComponents shipComponents;
+
+    bool paused;
+    double thrust_level;
 } GameState;
 
 void init_gamestate(void);

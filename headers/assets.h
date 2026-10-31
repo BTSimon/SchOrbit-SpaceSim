@@ -3,9 +3,12 @@
 
 #include <SDL3/SDL.h>
 
-extern SDL_FPoint nose[];
-extern SDL_FPoint leftFin[];
-extern SDL_FPoint rightFin[];
-extern SDL_FRect body;
+extern const SDL_FPoint ship_hull[];
+extern const SDL_FPoint ship_left_wing[];
+extern const SDL_FPoint ship_right_wing[];
+extern const SDL_FPoint ship_cockpit[];
+extern const SDL_FPoint ship_center_flame[];
+extern const SDL_FPoint ship_left_flame[];
+extern const SDL_FPoint ship_right_flame[];
 
 #endif

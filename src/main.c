@@ -17,6 +17,7 @@ int main(void)
         game_loop();
     }
 
+    exit_window();
     return 0;
 }
 
