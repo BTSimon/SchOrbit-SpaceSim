@@ -488,7 +488,7 @@ static void render_statistics_values(SDL_Renderer *renderer, TTF_Font *font) {
     );
 }
 
-void render_statistics(SDL_Renderer *renderer, TTF_Font *font) {
+void render_statistics_window(SDL_Renderer *renderer, TTF_Font *font) {
     if (renderer == NULL || font == NULL) {
         return;
     }
@@ -563,7 +563,7 @@ void render_frame(SDL_Renderer *renderer, TTF_Font *font) {
             render_test_window(renderer, font, ship_position);
             break;
         case GAME_MODE_STATISTICS:
-            render_statistics(renderer, font);
+            render_statistics_window(renderer, font);
             break;
         default:
             render_text(renderer, font, "Unknown game mode", 20.0f, 20.0f, COLOR_TEXT);
