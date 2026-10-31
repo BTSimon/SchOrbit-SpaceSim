@@ -38,11 +38,11 @@ Coordinates calculate_position(Coordinates pos, Vector speed, Vector acc, double
     return newPos;
 }
 
-Vector calculate_thrust(double thrust, double mass) {
+Vector calculate_thrust(double thrust, double mass, double percentage) {
     Vector acc;
 
     acc.x = 0;
-    acc.y = thrust/mass;
+    acc.y = (thrust/mass) * percentage;
 
     return acc;
 }
@@ -55,7 +55,7 @@ Vector calculate_drag_acceleration(Vector velocity, Drag drag_prop, Coordinates 
     Vector drag;
     double rho = calculate_air_density(position.y);
     drag.x = 0;
-    drag.y = (-0.5*rho*velocity.y*fabs(velocity.y)*drag_prop.drag_coefficient*drag_prop.area)/mass;
+    drag.y = ((-0.5*rho*velocity.y*fabs(velocity.y)*drag_prop.drag_coefficient*drag_prop.area)/mass);
     return drag;
 }
 
@@ -92,9 +92,9 @@ void physics_loop(double delta_time) {
         }
     
         if (gameState.shipParams.fuel - gameState.shipParams.propellant_flow_rate * delta_time >= 0) {
-            current_thrust = calculate_thrust(gameState.shipParams.thrust, gameState.shipParams.mass);
-            gameState.shipParams.fuel -= gameState.shipParams.propellant_flow_rate * delta_time;
-            gameState.shipParams.mass -= gameState.shipParams.propellant_flow_rate * delta_time;
+            current_thrust = calculate_thrust(gameState.shipParams.thrust, gameState.shipParams.mass, gameState.thrust_level);
+            gameState.shipParams.fuel -= gameState.shipParams.propellant_flow_rate * delta_time * gameState.thrust_level;
+            gameState.shipParams.mass -= gameState.shipParams.propellant_flow_rate * delta_time * gameState.thrust_level;
         }
         net_acceleration = calculate_acceleration(calculate_acceleration(current_g, current_thrust), drag_acc);
     

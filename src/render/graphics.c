@@ -482,9 +482,121 @@ static void render_statistics_values(SDL_Renderer *renderer, TTF_Font *font) {
         renderer, font, "Elapsed Time: %.1f s",
         gameState.shipParams.elapsed_time, 110.0f
     );
-    render_statistic(
-        renderer, font, "Thrust: %.1f%%",
-        gameState.thrust_level, 310.0f
+}
+
+static void render_vertical_indicator(
+    SDL_Renderer *renderer,
+    TTF_Font *font,
+    float x,
+    float y,
+    const char *label,
+    double percentage,
+    SDL_Color fill_color
+) {
+    const float width = 20.0f;
+    const float height = 105.0f;
+    const float inset = 3.0f;
+
+    if (percentage < 0.0) {
+        percentage = 0.0;
+    } else if (percentage > 1.0) {
+        percentage = 1.0;
+    }
+
+    const float text_center_x = x + width * 0.5f;
+    int text_width = 0;
+    int text_height = 0;
+    if (font != NULL && TTF_GetStringSize(font, label, 0, &text_width, &text_height)) {
+        render_text(
+            renderer,
+            font,
+            label,
+            text_center_x - (float)text_width * 0.5f,
+            y - 22.0f,
+            COLOR_TEXT
+        );
+    }
+
+    const SDL_FRect track = {x, y, width, height};
+    const SDL_FRect interior = {
+        x + inset,
+        y + inset,
+        width - inset * 2.0f,
+        height - inset * 2.0f
+    };
+    SDL_SetRenderDrawColor(renderer, 13, 17, 27, 255);
+    SDL_RenderFillRect(renderer, &track);
+    SDL_SetRenderDrawColor(renderer, 86, 96, 112, 255);
+    SDL_RenderRect(renderer, &track);
+    SDL_SetRenderDrawColor(renderer, 28, 33, 44, 255);
+    SDL_RenderFillRect(renderer, &interior);
+
+    const float fill_height = interior.h * (float)percentage;
+    if (fill_height > 0.0f) {
+        const SDL_FRect fill = {
+            interior.x,
+            interior.y + interior.h - fill_height,
+            interior.w,
+            fill_height
+        };
+        SDL_SetRenderDrawColor(
+            renderer,
+            fill_color.r,
+            fill_color.g,
+            fill_color.b,
+            fill_color.a
+        );
+        SDL_RenderFillRect(renderer, &fill);
+    }
+
+    char value_text[16];
+    snprintf(value_text, sizeof(value_text), "%.0f%%", percentage * 100.0);
+    text_width = 0;
+    text_height = 0;
+    if (font != NULL && TTF_GetStringSize(font, value_text, 0, &text_width, &text_height)) {
+        render_text(
+            renderer,
+            font,
+            value_text,
+            text_center_x - (float)text_width * 0.5f,
+            y + height + 5.0f,
+            COLOR_TEXT
+        );
+    }
+}
+
+static void render_flight_indicators(
+    SDL_Renderer *renderer,
+    TTF_Font *font,
+    int width,
+    int height
+) {
+    const float fuel_x = (float)width - 32.0f - 20.0f;
+    const float thrust_x = fuel_x - 52.0f;
+    const float bar_y = (float)height - 172.0f;
+    const double fuel_capacity =
+        get_body_properties(gameState.shipComponents.body).fuel_storage;
+    const double fuel_percentage = fuel_capacity > 0.0
+        ? gameState.shipParams.fuel / fuel_capacity
+        : 0.0;
+
+    render_vertical_indicator(
+        renderer,
+        font,
+        thrust_x,
+        bar_y,
+        "THRUST",
+        gameState.thrust_level,
+        COLOR_FIRE_ORANGE
+    );
+    render_vertical_indicator(
+        renderer,
+        font,
+        fuel_x,
+        bar_y,
+        "FUEL",
+        fuel_percentage,
+        (SDL_Color){83, 213, 170, 255}
     );
 }
 
@@ -514,12 +626,15 @@ static void render_design_window(
 static void render_test_window(
     SDL_Renderer *renderer,
     TTF_Font *font,
-    Coordinates ship_position
+    Coordinates ship_position,
+    int width,
+    int height
 ) {
     render_text(renderer, font, "Test Run", 20.0f, 20.0f, COLOR_TEXT);
 
     render_ship(renderer, ship_position);
     render_statistics_values(renderer, font);
+    render_flight_indicators(renderer, font, width, height);
 }
 
 static void render_window_navigation(SDL_Renderer *renderer, TTF_Font *font) {
@@ -560,7 +675,13 @@ void render_frame(SDL_Renderer *renderer, TTF_Font *font) {
             render_design_window(renderer, font, ship_position);
             break;
         case GAME_MODE_TEST:
-            render_test_window(renderer, font, ship_position);
+            render_test_window(
+                renderer,
+                font,
+                ship_position,
+                output_width,
+                output_height
+            );
             break;
         case GAME_MODE_STATISTICS:
             render_statistics_window(renderer, font);
