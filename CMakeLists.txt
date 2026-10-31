@@ -19,6 +19,9 @@ add_executable(orbit
     src/platform/window.c
     src/platform/assets.c
     src/render/graphics.c
+    src/render/design_window.c
+    src/render/test_window.c
+    src/render/statistics_window.c
     
     src/simulation/physics.c
     src/simulation/components.c

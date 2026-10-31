@@ -15,7 +15,6 @@ void render_text(
     float y,
     SDL_Color color
 );
-void render_statistics(SDL_Renderer *renderer, TTF_Font *font);
 void render_frame(SDL_Renderer *renderer, TTF_Font *font);
 
 #endif
