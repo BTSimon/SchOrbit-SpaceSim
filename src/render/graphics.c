@@ -208,11 +208,91 @@ void render_text(
     SDL_DestroySurface(surface);
 }
 
-static void render_window_navigation(SDL_Renderer *renderer, TTF_Font *font) {
-    render_text(
-        renderer, font,
-        "1 Design    2 Test    3 Statistics    Esc Quit",
-        20.0f, 570.0f, COLOR_TEXT
+static void render_navigation_item(
+    SDL_Renderer *renderer,
+    TTF_Font *font,
+    float x,
+    float y,
+    float key_width,
+    const char *key,
+    const char *label,
+    bool active
+) {
+    const float key_height = 20.0f;
+    const SDL_FRect key_box = {x, y, key_width, key_height};
+    const SDL_Color key_fill = active
+        ? (SDL_Color){14, 66, 88, 255}
+        : (SDL_Color){17, 29, 44, 255};
+    const SDL_Color key_border = active
+        ? (SDL_Color){71, 205, 224, 255}
+        : (SDL_Color){55, 83, 104, 255};
+    const SDL_Color key_text = active
+        ? (SDL_Color){153, 238, 247, 255}
+        : (SDL_Color){181, 197, 209, 255};
+
+    SDL_SetRenderDrawColor(renderer, key_fill.r, key_fill.g, key_fill.b, key_fill.a);
+    SDL_RenderFillRect(renderer, &key_box);
+    SDL_SetRenderDrawColor(renderer, key_border.r, key_border.g, key_border.b, key_border.a);
+    SDL_RenderRect(renderer, &key_box);
+
+    int text_width = 0;
+    int text_height = 0;
+    if (font != NULL && TTF_GetStringSize(font, key, 0, &text_width, &text_height)) {
+        render_text(
+            renderer,
+            font,
+            key,
+            x + (key_width - (float)text_width) * 0.5f,
+            y + (key_height - (float)text_height) * 0.5f,
+            key_text
+        );
+    }
+
+    render_text(renderer, font, label, x + key_width + 6.0f, y + 2.0f, COLOR_TEXT);
+}
+
+static void render_window_navigation(
+    SDL_Renderer *renderer,
+    TTF_Font *font,
+    int width,
+    int height,
+    GameMode game_mode
+) {
+    const float bar_y = (float)height - 34.0f;
+    const SDL_FRect bar = {12.0f, bar_y, (float)width - 24.0f, 28.0f};
+    const SDL_Color bar_fill = {8, 16, 27, 255};
+    const SDL_Color accent = {31, 106, 137, 255};
+
+    SDL_SetRenderDrawColor(renderer, bar_fill.r, bar_fill.g, bar_fill.b, bar_fill.a);
+    SDL_RenderFillRect(renderer, &bar);
+    SDL_SetRenderDrawColor(renderer, accent.r, accent.g, accent.b, accent.a);
+    SDL_RenderRect(renderer, &bar);
+    SDL_RenderLine(renderer, 16.0f, bar_y + 1.0f, (float)width - 16.0f, bar_y + 1.0f);
+
+    const float item_y = bar_y + 4.0f;
+    render_navigation_item(
+        renderer, font, (float)width * 0.025f, item_y, 20.0f,
+        "1", "Design", game_mode == GAME_MODE_DESIGN
+    );
+    render_navigation_item(
+        renderer, font, (float)width * 0.15f, item_y, 20.0f,
+        "2", "Test", game_mode == GAME_MODE_TEST
+    );
+    render_navigation_item(
+        renderer, font, (float)width * 0.27f, item_y, 20.0f,
+        "3", "Statistics", game_mode == GAME_MODE_STATISTICS
+    );
+    render_navigation_item(
+        renderer, font, (float)width * 0.45f, item_y, 48.0f,
+        "SPACE", "Pause", false
+    );
+    render_navigation_item(
+        renderer, font, (float)width * 0.62f, item_y, 54.0f,
+        "UP/DN", "Thrust", false
+    );
+    render_navigation_item(
+        renderer, font, (float)width * 0.84f, item_y, 34.0f,
+        "ESC", "Quit", false
     );
 }
 
@@ -266,7 +346,13 @@ void render_frame(SDL_Renderer *renderer, TTF_Font *font) {
             break;
     }
 
-    render_window_navigation(renderer, font);
+    render_window_navigation(
+        renderer,
+        font,
+        output_width,
+        output_height,
+        gameState.gameMode
+    );
 
     SDL_RenderPresent(renderer);
 }

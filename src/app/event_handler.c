@@ -36,13 +36,13 @@ void event_handler(UI_ACTIONS action) {
                     gameState.paused = !gameState.paused;
                     break;
                 case UI_ACTION_INCREASE:
-                    if (gameState.thrust_level < 1) {
+                    if (gameState.thrust_level < 1.0) {
                         gameState.thrust_level += 0.05;
                     }
                     break;
 
                 case UI_ACTION_DECREASE:
-                    if (gameState.thrust_level > 0) {
+                    if (gameState.thrust_level > 0.0) {
                         gameState.thrust_level -= 0.05;
                     }
                     break;
