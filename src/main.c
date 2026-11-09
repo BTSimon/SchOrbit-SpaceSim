@@ -3,6 +3,17 @@
 #include "../headers/game.h"
 #include "../headers/window.h"
 
+/*
+PROJECT SchORBIT by Bartha-Tóth Simon
+Date of latest update: 2026.11.09
+
+
+TO BE REMOVED FROM FILES OTHER THAN PROJECT SUBMISSION:
+
+NEPTUN: MGNNGD
+
+*/
+
 bool running = true;
 
 int main(void)

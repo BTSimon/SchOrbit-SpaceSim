@@ -42,7 +42,7 @@ void get_component_properties(void) {
     gameState.shipParams.mass += get_thruster_properties(gameState.shipComponents.thruster).mass;
 
     gameState.shipParams.all_drag.drag_up = get_nose_properties(gameState.shipComponents.nose).drag_properties;
-    gameState.shipParams.all_drag.drag_down = get_nose_properties(gameState.shipComponents.thruster).drag_properties;
+    gameState.shipParams.all_drag.drag_down = get_thruster_properties(gameState.shipComponents.thruster).drag_properties;
 
     gameState.shipParams.fuel += get_body_properties(gameState.shipComponents.body).fuel_storage;
 

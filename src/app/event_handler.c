@@ -21,12 +21,17 @@ void event_handler(UI_ACTIONS action) {
             gameState.paused = true;
             break;
         case UI_ACTION_NONE:
+        case UI_ACTION_PAUSE:
+        case UI_ACTION_INCREASE:
+        case UI_ACTION_DECREASE:
             break;
     }
 
     //events based on gamestate
     switch (gameState.gameMode) {
         case GAME_MODE_DESIGN:
+            break;
+        case GAME_MODE_STATISTICS:
             break;
 
         case GAME_MODE_TEST:
@@ -45,6 +50,8 @@ void event_handler(UI_ACTIONS action) {
                     if (gameState.thrust_level > 0.0) {
                         gameState.thrust_level -= 0.05;
                     }
+                    break;
+                default:
                     break;
             }
             break;

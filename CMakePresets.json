@@ -1,26 +1,21 @@
-
 {
-  "version": 6,
+  "version": 3,
   "configurePresets": [
     {
-      "name": "ucrt64-debug",
-      "displayName": "MSYS2 UCRT64 Debug",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
+      "name": "gcc-debug-mingw",
+      "displayName": "GCC Debug (MinGW UCRT)",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build-mingw",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
-        "CMAKE_MAKE_PROGRAM": "C:/msys64/ucrt64/bin/ninja.exe",
-        "CMAKE_PREFIX_PATH": "C:/msys64/ucrt64",
-        "SDL3_DIR": "C:/msys64/ucrt64/lib/cmake/SDL3",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/dist"
+        "CMAKE_C_COMPILER": "gcc"
       }
     }
   ],
   "buildPresets": [
     {
-      "name": "ucrt64-debug",
-      "configurePreset": "ucrt64-debug"
+      "name": "gcc-debug-mingw",
+      "configurePreset": "gcc-debug-mingw"
     }
   ]
 }
