@@ -1,5 +1,6 @@
 #include "../../headers/physics.h"
 #include "../../headers/game_state.h"
+#include "../../headers/telemetry.h"
 
 #include <math.h>
 
@@ -106,7 +107,18 @@ void physics_loop(double delta_time) {
             pos->y = 0; 
             speed->y = 0;
         }
-    
+
+        
+        DataLine current_entry;
+        current_entry.timestamp = gameState.shipParams.elapsed_time;
+        current_entry.acceleration = net_acceleration.y;
+        current_entry.mass = gameState.shipParams.mass;
+        current_entry.altitude = gameState.shipParams.realPosition.y;
+        current_entry.speed = gameState.shipParams.speed.y;
+        current_entry.thrust = gameState.thrust_level;
+
+        record_telemetry(current_entry);
     }
+
 
 }

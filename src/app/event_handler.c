@@ -1,11 +1,13 @@
 #include "../../headers/event_handler.h"
 #include "../../headers/main.h"
 #include "../../headers/game_state.h"
+#include "../../headers/telemetry.h"
 
 void event_handler(UI_ACTIONS action) {
     //Same event for all gamestates 
     switch (action) {
         case UI_ACTION_QUIT:
+            save_telemetry();
             quit_game();
             break;
         case UI_ACTION_SHOW_DESIGN:
