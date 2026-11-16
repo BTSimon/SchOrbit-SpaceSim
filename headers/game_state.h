@@ -4,6 +4,7 @@
 #include "./types.h"
 #include "./components.h"
 #include <stdbool.h>
+#include "./telemetry.h"
 
 typedef enum {
     GAME_MODE_DESIGN,
@@ -43,9 +44,16 @@ typedef struct {
 } ShipParams;
 
 typedef struct {
+    DataType x_axis;
+    DataType y_axis; 
+} StatisticsParams;
+
+typedef struct {
     GameMode gameMode;
     ShipParams shipParams;
     ShipComponents shipComponents;
+    StatisticsParams statisticsParams;
+
 
     bool paused;
     double thrust_level;
@@ -53,6 +61,7 @@ typedef struct {
 
 void init_gamestate(void);
 void get_component_properties(void);
+DataType graph_axis_next(DataType current, int jump); 
 
 extern GameState gameState;
 

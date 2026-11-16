@@ -7,7 +7,6 @@ void event_handler(UI_ACTIONS action) {
     //Same event for all gamestates 
     switch (action) {
         case UI_ACTION_QUIT:
-            save_telemetry();
             quit_game();
             break;
         case UI_ACTION_SHOW_DESIGN:
@@ -34,6 +33,18 @@ void event_handler(UI_ACTIONS action) {
         case GAME_MODE_DESIGN:
             break;
         case GAME_MODE_STATISTICS:
+            switch (action)
+            {
+                case UI_ACTION_INCREASE:
+                    gameState.statisticsParams.y_axis = graph_axis_next(gameState.statisticsParams.y_axis, +1);
+                    break;
+
+                case UI_ACTION_DECREASE:
+                    gameState.statisticsParams.y_axis = graph_axis_next(gameState.statisticsParams.y_axis, -1);
+                    break;
+                default:
+                    break;
+            }
             break;
 
         case GAME_MODE_TEST:

@@ -15,6 +15,14 @@ void render_text(
     float y,
     SDL_Color color
 );
+void render_text_rotated(
+    SDL_Renderer *renderer,
+    TTF_Font *font,
+    const char *text,
+    float x,
+    float y,
+    SDL_Color color
+);
 void render_frame(SDL_Renderer *renderer, TTF_Font *font);
 
 #endif

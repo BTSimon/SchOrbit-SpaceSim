@@ -109,7 +109,32 @@ SDL_FPoint *create_points_array(double *values_x, double *values_y, int valuesSi
     return points;
 }
 
-void render_graph_baselines(SDL_Renderer *renderer) {
+char *get_type_name(DataType type) {
+    switch (type)
+    {
+        case ACCELERATION:
+            return "Acceleration";
+            break;
+        case TIMESTAMP:
+            return "Elapsed time";
+            break;
+        case SPEED:
+            return "Velocity";
+        case MASS:
+            return "Mass";
+            break;
+        case ALTITUDE:
+            return "Altitude";
+            break;
+        case THRUST:
+            return "Thrust level";
+        default:
+            return "Invalid";
+            break;
+    }
+}
+
+void render_graph_baselines(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, COLOR_GRAPH.r, COLOR_GRAPH.g, COLOR_GRAPH.b, COLOR_GRAPH.a);
     SDL_RenderLine(renderer, 50, 50, 50, 525);
     SDL_RenderLine(renderer, 50, 525, 950, 525);
@@ -121,19 +146,24 @@ void render_graph_baselines(SDL_Renderer *renderer) {
     for (int y = 100; y<=950; y+=50) {
         SDL_RenderLine(renderer, y, 520, y, 530);
     }
+    char *text_x = get_type_name(gameState.statisticsParams.x_axis);
+    render_text(renderer, font, text_x, 500, 540, COLOR_TEXT);
+
+    char *text_y = get_type_name(gameState.statisticsParams.y_axis);
+    render_text_rotated(renderer, font, text_y, 20, 275, COLOR_TEXT);
 
 }
 
 void render_graph_lines(SDL_Renderer *renderer) {
     int arraySize = 0;
-    double *x_values = create_record_array(TIMESTAMP, &arraySize);
-    double *y_values = create_record_array(ALTITUDE, &arraySize);
+    double *x_values = create_record_array(gameState.statisticsParams.x_axis, &arraySize);
+    double *y_values = create_record_array(gameState.statisticsParams.y_axis, &arraySize);
     SDL_FPoint *points = create_points_array(x_values, y_values, arraySize, 50, 525, 900, 475);
     SDL_SetRenderDrawColor(renderer, COLOR_GRAPH_POINT.r, COLOR_GRAPH_POINT.g, COLOR_GRAPH_POINT.b, COLOR_GRAPH_POINT.a);
+    
     for (int i = 0; i<arraySize-1; i++) {
         SDL_RenderLine(renderer, points[i].x, points[i].y, points[i+1].x, points[i+1].y);
-    }
-    SDL_RenderPoints(renderer, points, arraySize);
+    } 
     free(x_values);
     free(y_values);
     free(points);
@@ -147,7 +177,7 @@ void render_statistics_window(SDL_Renderer *renderer, TTF_Font *font) {
     int output_width = 1000;
     int output_height = 600;
     SDL_GetCurrentRenderOutputSize(renderer, &output_width, &output_height);
-    render_graph_baselines(renderer);
+    render_graph_baselines(renderer, font);
     render_graph_lines(renderer);
 
 }

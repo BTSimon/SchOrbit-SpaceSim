@@ -208,6 +208,46 @@ void render_text(
     SDL_DestroySurface(surface);
 }
 
+void render_text_rotated(
+    SDL_Renderer *renderer,
+    TTF_Font *font,
+    const char *text,
+    float x,
+    float y,
+    SDL_Color color
+) {
+    if (renderer == NULL || font == NULL || text == NULL) {
+        return;
+    }
+
+    SDL_Surface *surface = TTF_RenderText_Blended(font, text, 0, color);
+    if (surface == NULL) {
+        SDL_Log("Text rendering failed: %s", SDL_GetError());
+        return;
+    }
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (texture == NULL) {
+        SDL_Log("Text texture creation failed: %s", SDL_GetError());
+        SDL_DestroySurface(surface);
+        return;
+    }
+
+    SDL_FRect destination = {
+        x - surface->w / 2.0f,
+        y - surface->h / 2.0f,
+        (float)surface->w,
+        (float)surface->h
+    };
+
+    SDL_RenderTextureRotated(
+        renderer, texture, NULL, &destination,
+        270.0, NULL, SDL_FLIP_NONE
+    );
+    SDL_DestroyTexture(texture);
+    SDL_DestroySurface(surface);
+}
+
 static void render_navigation_item(
     SDL_Renderer *renderer,
     TTF_Font *font,
@@ -282,18 +322,48 @@ static void render_window_navigation(
         renderer, font, (float)width * 0.27f, item_y, 20.0f,
         "3", "Statistics", game_mode == GAME_MODE_STATISTICS
     );
-    render_navigation_item(
-        renderer, font, (float)width * 0.45f, item_y, 48.0f,
-        "SPACE", "Pause", false
-    );
-    render_navigation_item(
-        renderer, font, (float)width * 0.62f, item_y, 54.0f,
-        "UP/DN", "Thrust", false
-    );
-    render_navigation_item(
-        renderer, font, (float)width * 0.84f, item_y, 34.0f,
-        "ESC", "Quit", false
-    );
+
+    switch (game_mode) {
+        case GAME_MODE_DESIGN:
+            render_navigation_item(
+                renderer, font, (float)width * 0.45f, item_y, 48.0f,
+                "SPACE", "Pause", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.62f, item_y, 54.0f,
+                "UP/DN", "Thrust", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.84f, item_y, 34.0f,
+                "ESC", "Quit", false
+            );
+            break;
+        case GAME_MODE_STATISTICS:
+            render_navigation_item(
+                renderer, font, (float)width * 0.42f, item_y, 54.0f,
+                "UP/DN", "Change graph view", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.84f, item_y, 34.0f,
+                "ESC", "Quit", false
+            );
+            break;
+        case GAME_MODE_TEST:
+            render_navigation_item(
+                renderer, font, (float)width * 0.45f, item_y, 48.0f,
+                "SPACE", "Pause", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.62f, item_y, 54.0f,
+                "UP/DN", "Thrust", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.84f, item_y, 34.0f,
+                "ESC", "Quit", false
+            );
+            break;
+    }
+
 }
 
 void render_frame(SDL_Renderer *renderer, TTF_Font *font) {

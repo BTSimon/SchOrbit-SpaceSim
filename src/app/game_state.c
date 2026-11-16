@@ -33,6 +33,9 @@ void init_gamestate(void) {
 
     gameState.paused = false;
     gameState.thrust_level = 0.0;
+
+    gameState.statisticsParams.x_axis = TIMESTAMP;
+    gameState.statisticsParams.y_axis = ALTITUDE;
 }
 
 void get_component_properties(void) {
@@ -48,6 +51,17 @@ void get_component_properties(void) {
 
     gameState.shipParams.thrust += get_thruster_properties(gameState.shipComponents.thruster).thrust;
     gameState.shipParams.propellant_flow_rate += get_thruster_properties(gameState.shipComponents.thruster).propellant_flow_rate;
+}
+
+DataType graph_axis_next(DataType current, int jump) {
+    DataType types[] = {TIMESTAMP, MASS, ACCELERATION, ALTITUDE, SPEED, THRUST};
+    int currentIndex = 0;
+    for (int i = 0; i<6; i++) {
+        if (types[i] == current) {
+            currentIndex = i;
+        }
+    }
+    return types[((currentIndex+jump)%6 + 6) % 6];
 }
 
 

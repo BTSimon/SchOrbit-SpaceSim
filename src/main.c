@@ -2,7 +2,7 @@
 
 #include "../headers/game.h"
 #include "../headers/window.h"
-#include "../headers/debugmalloc.h"
+#include "../headers/telemetry.h"
 
 /*
 PROJECT SchORBIT by Bartha-Tóth Simon
@@ -35,5 +35,6 @@ int main(void)
 }
 
 void quit_game(void) {
+    save_telemetry();
     running = false;
 }
