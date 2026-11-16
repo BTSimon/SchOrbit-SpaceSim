@@ -33,7 +33,7 @@ const BodyProperties bodies[] = {
 const ThrusterProperties thrusters[] = {
     [THRUSTER_EFFICIENT] = {
         .mass = 8,
-        .thrust = 1500,
+        .thrust = 5500.0,
         .propellant_flow_rate = 2.0,
         .drag_properties = {
             .area = 0.05,
@@ -43,7 +43,7 @@ const ThrusterProperties thrusters[] = {
 
     [THRUSTER_FAST] = {
         .mass = 300.0,
-        .thrust = 1800.0,
+        .thrust = 5000.0,
         .propellant_flow_rate = 40.0,
         .drag_properties = {
             .area = 10,

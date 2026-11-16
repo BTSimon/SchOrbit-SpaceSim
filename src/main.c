@@ -2,6 +2,7 @@
 
 #include "../headers/game.h"
 #include "../headers/window.h"
+#include "../headers/debugmalloc.h"
 
 /*
 PROJECT SchORBIT by Bartha-Tóth Simon
@@ -21,8 +22,9 @@ int main(void)
     if (init_window() > 0) {
         return 1;
     }
-
-    init_game();
+    if (init_game() > 0) {
+        return 1;
+    }
 
     while (running) {
         game_loop();

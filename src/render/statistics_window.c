@@ -1,14 +1,19 @@
 #include "../../headers/window_renderers.h"
 #include "../../headers/game_state.h"
+#include "../../headers/telemetry.h"
+#include "../../headers/debugmalloc.h"
 
 #include <stdio.h>
 
 static const SDL_Color COLOR_TEXT = {255, 255, 255, 255};
+static const SDL_Color COLOR_GRAPH = {170, 170, 170, 128};
+static const SDL_Color COLOR_GRAPH_POINT = {255, 26, 0, 128};
+/*
 static const SDL_Color COLOR_ACCENT = {71, 205, 224, 255};
 static const SDL_Color COLOR_PANEL = {8, 17, 33, 255};
 static const SDL_Color COLOR_PANEL_HEADER = {13, 34, 56, 255};
 static const SDL_Color COLOR_PANEL_BORDER = {28, 104, 137, 255};
-static const SDL_Color COLOR_ROW_DIVIDER = {24, 55, 78, 255};
+static const SDL_Color COLOR_ROW_DIVIDER = {24, 55, 78, 255}; */
 
 static void render_statistic(
     SDL_Renderer *renderer,
@@ -68,6 +73,72 @@ void render_statistics_values(SDL_Renderer *renderer, TTF_Font *font) {
     render_statistics_values_at(renderer, font, 20.0f, 50.0f, 20.0f);
 }
 
+SDL_FPoint *create_points_array(double *values_x, double *values_y, int valuesSize, float offsetx, float offsety, float max_width, float max_height) {
+    SDL_FPoint *points = malloc(sizeof(SDL_FPoint)*valuesSize);
+    if (points == NULL) {
+        return NULL;
+    }
+
+    double minval_x = values_x[0];
+    double maxval_x = values_x[0];
+    for (int i = 0; i<valuesSize; i++) {
+        if (values_x[i] > maxval_x) {
+            maxval_x = values_x[i];
+        } 
+        if (values_x[i] < minval_x) {
+            minval_x = values_x[i];
+        }
+    }
+
+    double minval_y = values_y[0];
+    double maxval_y = values_y[0];
+    for (int i = 0; i<valuesSize; i++) {
+        if (values_y[i] > maxval_y) {
+            maxval_y = values_y[i];
+        } 
+        if (values_y[i] < minval_y) {
+            minval_y = values_y[i];
+        }
+    }
+    double range_x = maxval_x-minval_x;
+    double range_y = maxval_y-minval_y;
+    for (int i = 0; i<valuesSize; i++) {
+        points[i].x = offsetx + ((values_x[i]-minval_x)/range_x)*max_width;
+        points[i].y = offsety - ((values_y[i]-minval_y)/range_y)*max_height;
+    }
+    return points;
+}
+
+void render_graph_baselines(SDL_Renderer *renderer) {
+    SDL_SetRenderDrawColor(renderer, COLOR_GRAPH.r, COLOR_GRAPH.g, COLOR_GRAPH.b, COLOR_GRAPH.a);
+    SDL_RenderLine(renderer, 50, 50, 50, 525);
+    SDL_RenderLine(renderer, 50, 525, 950, 525);
+
+
+    for (int x = 50; x<525; x+=50) {
+        SDL_RenderLine(renderer, 45, x, 55, x);
+    }
+    for (int y = 100; y<=950; y+=50) {
+        SDL_RenderLine(renderer, y, 520, y, 530);
+    }
+
+}
+
+void render_graph_lines(SDL_Renderer *renderer) {
+    int arraySize = 0;
+    double *x_values = create_record_array(TIMESTAMP, &arraySize);
+    double *y_values = create_record_array(ALTITUDE, &arraySize);
+    SDL_FPoint *points = create_points_array(x_values, y_values, arraySize, 50, 525, 900, 475);
+    SDL_SetRenderDrawColor(renderer, COLOR_GRAPH_POINT.r, COLOR_GRAPH_POINT.g, COLOR_GRAPH_POINT.b, COLOR_GRAPH_POINT.a);
+    for (int i = 0; i<arraySize-1; i++) {
+        SDL_RenderLine(renderer, points[i].x, points[i].y, points[i+1].x, points[i+1].y);
+    }
+    SDL_RenderPoints(renderer, points, arraySize);
+    free(x_values);
+    free(y_values);
+    free(points);
+}
+
 void render_statistics_window(SDL_Renderer *renderer, TTF_Font *font) {
     if (renderer == NULL || font == NULL) {
         return;
@@ -76,63 +147,7 @@ void render_statistics_window(SDL_Renderer *renderer, TTF_Font *font) {
     int output_width = 1000;
     int output_height = 600;
     SDL_GetCurrentRenderOutputSize(renderer, &output_width, &output_height);
+    render_graph_baselines(renderer);
+    render_graph_lines(renderer);
 
-    const float panel_width = (float)(output_width < 700 ? output_width - 48 : 620);
-    const float panel_height = (float)(output_height < 430 ? output_height - 80 : 340);
-    const float panel_x = ((float)output_width - panel_width) * 0.5f;
-    const float panel_y = ((float)output_height - panel_height) * 0.5f;
-    const SDL_FRect panel = {panel_x, panel_y, panel_width, panel_height};
-    const SDL_FRect header = {panel_x + 2.0f, panel_y + 2.0f, panel_width - 4.0f, 62.0f};
-    const SDL_FRect inset_border = {
-        panel_x + 7.0f,
-        panel_y + 7.0f,
-        panel_width - 14.0f,
-        panel_height - 14.0f
-    };
-
-    SDL_SetRenderDrawColor(renderer, COLOR_PANEL.r, COLOR_PANEL.g, COLOR_PANEL.b, COLOR_PANEL.a);
-    SDL_RenderFillRect(renderer, &panel);
-    SDL_SetRenderDrawColor(
-        renderer,
-        COLOR_PANEL_BORDER.r,
-        COLOR_PANEL_BORDER.g,
-        COLOR_PANEL_BORDER.b,
-        COLOR_PANEL_BORDER.a
-    );
-    SDL_RenderRect(renderer, &panel);
-    SDL_RenderRect(renderer, &inset_border);
-
-    SDL_SetRenderDrawColor(
-        renderer,
-        COLOR_PANEL_HEADER.r,
-        COLOR_PANEL_HEADER.g,
-        COLOR_PANEL_HEADER.b,
-        COLOR_PANEL_HEADER.a
-    );
-    SDL_RenderFillRect(renderer, &header);
-    SDL_SetRenderDrawColor(renderer, COLOR_ACCENT.r, COLOR_ACCENT.g, COLOR_ACCENT.b, COLOR_ACCENT.a);
-    SDL_RenderLine(renderer, panel_x + 2.0f, panel_y + 64.0f, panel_x + panel_width - 2.0f, panel_y + 64.0f);
-
-    render_text(renderer, font, "FLIGHT STATISTICS", panel_x + 28.0f, panel_y + 22.0f, COLOR_ACCENT);
-    render_text(renderer, font, "LIVE TELEMETRY", panel_x + panel_width - 151.0f, panel_y + 25.0f, COLOR_TEXT);
-
-    for (int row = 0; row < 4; ++row) {
-        const float divider_y = panel_y + 94.0f + (float)row * 48.0f;
-        SDL_SetRenderDrawColor(
-            renderer,
-            COLOR_ROW_DIVIDER.r,
-            COLOR_ROW_DIVIDER.g,
-            COLOR_ROW_DIVIDER.b,
-            COLOR_ROW_DIVIDER.a
-        );
-        SDL_RenderLine(renderer, panel_x + 25.0f, divider_y, panel_x + panel_width - 25.0f, divider_y);
-    }
-
-    render_statistics_values_at(
-        renderer,
-        font,
-        panel_x + 30.0f,
-        panel_y + 104.0f,
-        48.0f
-    );
 }

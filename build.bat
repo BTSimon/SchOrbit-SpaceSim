@@ -4,7 +4,7 @@ cd /d "%~dp0"
 
 if not exist build mkdir build
 
-gcc -Wall -Werror^
+gcc -std=c17 -O2 -Wall -Wextra -Wpedantic ^
     -Iheaders ^
     -Ithird_party/mingw64-ucrt/include ^
     src/main.c ^
@@ -19,11 +19,14 @@ gcc -Wall -Werror^
     src/render/statistics_window.c ^
     src/simulation/physics.c ^
     src/simulation/components.c ^
+    src/simulation/telemetry.c ^
     src/ui/ui.c ^
     -Lthird_party/mingw64-ucrt/lib ^
     -static ^
     -lSDL3_ttf -lSDL3 ^
     -lm -liconv ^
+    -lkernel32 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 ^
+    -lversion -luuid -ladvapi32 -lsetupapi -lshell32 -ldinput8 ^
     -lfreetype -lbz2 -lpng16 -lm -lz -lharfbuzz -lm ^
     -lusp10 -lgdi32 -lrpcrt4 -luser32 -ldwrite -lglib-2.0 -lintl ^
     -lws2_32 -lole32 -lwinmm -lshlwapi -luuid -latomic -lm ^
