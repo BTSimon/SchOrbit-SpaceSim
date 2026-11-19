@@ -33,6 +33,55 @@ int init_telemetry(void) {
     return 0;
 }
 
+DataLine *parseLine(char *line) {
+    DataLine *returnLine;
+    if (sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf", 
+            returnLine->timestamp, 
+            returnLine->acceleration, 
+            returnLine->mass, 
+            returnLine->altitude, 
+            returnLine->speed,
+            returnLine->thrust) == 6) {
+        sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf", 
+            returnLine->timestamp, 
+            returnLine->acceleration, 
+            returnLine->mass, 
+            returnLine->altitude, 
+            returnLine->speed,
+            returnLine->thrust);
+    } else {
+        return NULL;
+    }
+    return returnLine;
+}
+
+DataLine *open_telemetry(int *sizeOf) {
+    FILE *file = fopen("example.csv", "r");
+    if (file == NULL) {
+        //recordsCount = NULL;
+        return;
+    }    
+
+    char buff[512];
+    int builtRecordSize = 0;
+    DataLine *builtRecords = malloc(sizeof(DataLine) * builtRecordSize);
+    while (fgets(buff, sizeof(buff), file) != NULL)
+    {
+        DataLine *parsedRecord = parseLine(buff);
+        if (parsedRecord != NULL) {
+            builtRecordSize++;
+            DataLine *ptr = realloc(builtRecords, sizeof(DataLine)*builtRecordSize);
+            if (ptr == NULL) {
+                return NULL;
+            }
+            builtRecords = ptr;
+            builtRecords[builtRecordSize-1] = *parsedRecord;
+        } 
+    }
+    *sizeOf = builtRecordSize;
+    return builtRecords;
+}
+
 int record_telemetry(DataLine dataEntry) {
     if (memoryRecordsCount == memoryRecordsCapacity) {
 
@@ -84,8 +133,8 @@ int save_telemetry(void) {
 }
 
 double *create_record_array(DataType recordType, int *recordSize) {
-    *recordSize = memoryRecordsCount;
-    double *returnArray = malloc(sizeof(double)*memoryRecordsCount);
+    memoryRecords = open_telemetry(recordSize);
+    double *returnArray = malloc(sizeof(double)*(*recordSize));
     if (returnArray == NULL) {
         return NULL;
     }
