@@ -7,13 +7,24 @@
 
 static const SDL_Color COLOR_TEXT = {255, 255, 255, 255};
 static const SDL_Color COLOR_GRAPH = {170, 170, 170, 128};
-static const SDL_Color COLOR_GRAPH_POINT = {255, 26, 0, 128};
+static const SDL_Color COLOR_GRAPH_POINT1 = {255, 26, 0, 128};
+static const SDL_Color COLOR_GRAPH_POINT2 = {0, 255, 26, 128};
+
 /*
 static const SDL_Color COLOR_ACCENT = {71, 205, 224, 255};
 static const SDL_Color COLOR_PANEL = {8, 17, 33, 255};
 static const SDL_Color COLOR_PANEL_HEADER = {13, 34, 56, 255};
 static const SDL_Color COLOR_PANEL_BORDER = {28, 104, 137, 255};
 static const SDL_Color COLOR_ROW_DIVIDER = {24, 55, 78, 255}; */
+
+static double *x_axis_values = NULL;
+static double *y_axis_values_1 = NULL;
+static double *y_axis_values_2 = NULL;
+
+static SDL_FPoint *points_1 = NULL;
+static SDL_FPoint *points_2 = NULL;
+
+static int points_count = 0;
 
 static void render_statistic(
     SDL_Renderer *renderer,
@@ -155,18 +166,38 @@ void render_graph_baselines(SDL_Renderer *renderer, TTF_Font *font) {
 }
 
 void render_graph_lines(SDL_Renderer *renderer) {
-    int arraySize = 0;
-    double *x_values = create_record_array(gameState.statisticsParams.x_axis, &arraySize);
-    double *y_values = create_record_array(gameState.statisticsParams.y_axis, &arraySize);
-    SDL_FPoint *points = create_points_array(x_values, y_values, arraySize, 50, 525, 900, 475);
-    SDL_SetRenderDrawColor(renderer, COLOR_GRAPH_POINT.r, COLOR_GRAPH_POINT.g, COLOR_GRAPH_POINT.b, COLOR_GRAPH_POINT.a);
+    if (gameState.statisticsParams.graph_changed) {
+        //free the previous arrays
+        free(x_axis_values);
+
+        free(y_axis_values_1);
+        free(y_axis_values_2);
+
+        free(points_1);
+        free(points_2);
+
+
+        //create the new arrays
+        x_axis_values = create_record_array(gameState.statisticsParams.x_axis, &points_count);
+        y_axis_values_1 = create_record_array(gameState.statisticsParams.y_axis, &points_count);
+        y_axis_values_2 = create_record_array(THRUST, &points_count);
+
+        points_1 = create_points_array(x_axis_values, y_axis_values_1, points_count, 50, 525, 900, 475);
+        points_2 = create_points_array(x_axis_values, y_axis_values_2, points_count, 50, 525, 900, 475);
+
+        gameState.statisticsParams.graph_changed = false;
+    }
+    SDL_SetRenderDrawColor(renderer, COLOR_GRAPH_POINT1.r, COLOR_GRAPH_POINT1.g, COLOR_GRAPH_POINT1.b, COLOR_GRAPH_POINT1.a);
     
-    for (int i = 0; i<arraySize-1; i++) {
-        SDL_RenderLine(renderer, points[i].x, points[i].y, points[i+1].x, points[i+1].y);
+    for (int i = 0; i<points_count-1; i++) {
+        SDL_RenderLine(renderer, points_1[i].x, points_1[i].y, points_1[i+1].x, points_1[i+1].y);
     } 
-    free(x_values);
-    free(y_values);
-    free(points);
+    SDL_SetRenderDrawColor(renderer, COLOR_GRAPH_POINT2.r, COLOR_GRAPH_POINT2.g, COLOR_GRAPH_POINT2.b, COLOR_GRAPH_POINT2.a);
+    
+    for (int i = 0; i<points_count-1; i++) {
+        SDL_RenderLine(renderer, points_2[i].x, points_2[i].y, points_2[i+1].x, points_2[i+1].y);
+    } 
+
 }
 
 void render_statistics_window(SDL_Renderer *renderer, TTF_Font *font) {
@@ -180,4 +211,12 @@ void render_statistics_window(SDL_Renderer *renderer, TTF_Font *font) {
     render_graph_baselines(renderer, font);
     render_graph_lines(renderer);
 
+}
+
+void exit_statistics_window(void) {
+    free(x_axis_values);
+    free(y_axis_values_1);
+    free(y_axis_values_2);
+    free(points_1);
+    free(points_2);
 }

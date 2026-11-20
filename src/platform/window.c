@@ -8,6 +8,7 @@
 #include "../../headers/main.h"
 #include "../../headers/ui.h"
 #include "../../headers/window.h"
+#include "../../headers/window_renderers.h"
 
 static const char *WINDOW_TITLE = "SchORBIT";
 static const int WINDOW_WIDTH = 1000;
@@ -94,6 +95,7 @@ void exit_window(void) {
         window = NULL;
     }
 
+    exit_statistics_window();
     SDL_Quit();
 }
 

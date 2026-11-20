@@ -29,5 +29,6 @@ void render_test_background(
 
 void render_statistics_window(SDL_Renderer *renderer, TTF_Font *font);
 void render_statistics_values(SDL_Renderer *renderer, TTF_Font *font);
+void exit_statistics_window(void);
 
 #endif
