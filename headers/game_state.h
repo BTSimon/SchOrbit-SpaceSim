@@ -46,6 +46,7 @@ typedef struct {
 typedef struct {
     DataType x_axis;
     DataType y_axis; 
+    bool graph_changed;
 } StatisticsParams;
 
 typedef struct {

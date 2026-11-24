@@ -36,6 +36,7 @@ void init_gamestate(void) {
 
     gameState.statisticsParams.x_axis = TIMESTAMP;
     gameState.statisticsParams.y_axis = ALTITUDE;
+    gameState.statisticsParams.graph_changed = false;
 }
 
 void get_component_properties(void) {

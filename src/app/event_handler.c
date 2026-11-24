@@ -20,6 +20,7 @@ void event_handler(UI_ACTIONS action) {
         case UI_ACTION_SHOW_STATISTICS:
             gameState.gameMode = GAME_MODE_STATISTICS;
             gameState.paused = true;
+            gameState.statisticsParams.graph_changed = true;
             break;
         case UI_ACTION_NONE:
         case UI_ACTION_PAUSE:
@@ -37,10 +38,12 @@ void event_handler(UI_ACTIONS action) {
             {
                 case UI_ACTION_INCREASE:
                     gameState.statisticsParams.y_axis = graph_axis_next(gameState.statisticsParams.y_axis, +1);
+                    gameState.statisticsParams.graph_changed = true;
                     break;
 
                 case UI_ACTION_DECREASE:
                     gameState.statisticsParams.y_axis = graph_axis_next(gameState.statisticsParams.y_axis, -1);
+                    gameState.statisticsParams.graph_changed = true;
                     break;
                 default:
                     break;

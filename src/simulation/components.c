@@ -20,21 +20,21 @@ const NoseProperties noses[] = {
 
 const BodyProperties bodies[] = {
     [BODY_LIGHTWEIGHT] = {
-        .mass = 450,
-        .fuel_storage = 200
+        .mass = 4500,
+        .fuel_storage = 2000
     },
 
     [BODY_STANDARD] = {
-        .mass = 1400.0,
-        .fuel_storage = 1300.0
+        .mass = 14000.0,
+        .fuel_storage = 13000.0
     }
 };
 
 const ThrusterProperties thrusters[] = {
     [THRUSTER_EFFICIENT] = {
         .mass = 8,
-        .thrust = 5500.0,
-        .propellant_flow_rate = 2.0,
+        .thrust = 55000.0,
+        .propellant_flow_rate = 20.0,
         .drag_properties = {
             .area = 0.05,
             .drag_coefficient = 0.8
