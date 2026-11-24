@@ -26,6 +26,10 @@ void event_handler(UI_ACTIONS action) {
         case UI_ACTION_PAUSE:
         case UI_ACTION_INCREASE:
         case UI_ACTION_DECREASE:
+        case UI_ACTION_SOURCE_PREVIOUS:
+        case UI_ACTION_SOURCE_NEXT:
+        case UI_ACTION_GRAPH2_INCREASE:
+        case UI_ACTION_GRAPH2_DECREASE:
             break;
     }
 
@@ -43,6 +47,22 @@ void event_handler(UI_ACTIONS action) {
 
                 case UI_ACTION_DECREASE:
                     gameState.statisticsParams.y_axis = graph_axis_next(gameState.statisticsParams.y_axis, -1);
+                    gameState.statisticsParams.graph_changed = true;
+                    break;
+                case UI_ACTION_GRAPH2_INCREASE:
+                    gameState.statisticsParams.y2_axis = graph_axis_next(gameState.statisticsParams.y2_axis, +1);
+                    gameState.statisticsParams.graph_changed = true;
+                    break;
+                case UI_ACTION_GRAPH2_DECREASE:
+                    gameState.statisticsParams.y2_axis = graph_axis_next(gameState.statisticsParams.y2_axis, -1);
+                    gameState.statisticsParams.graph_changed = true;
+                    break;
+                case UI_ACTION_SOURCE_PREVIOUS:
+                case UI_ACTION_SOURCE_NEXT:
+                    gameState.statisticsParams.source =
+                        gameState.statisticsParams.source == TELEMETRY_SOURCE_CURRENT_RUN
+                            ? TELEMETRY_SOURCE_EXAMPLE_FILE
+                            : TELEMETRY_SOURCE_CURRENT_RUN;
                     gameState.statisticsParams.graph_changed = true;
                     break;
                 default:

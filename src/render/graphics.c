@@ -341,7 +341,15 @@ static void render_window_navigation(
         case GAME_MODE_STATISTICS:
             render_navigation_item(
                 renderer, font, (float)width * 0.42f, item_y, 54.0f,
-                "UP/DN", "Change graph view", false
+                "UP/DN", "Graph 1 axis", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.58f, item_y, 34.0f,
+                "W/S", "Graph 2 axis", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.72f, item_y, 54.0f,
+                "LEFT/RT", "Data source", false
             );
             render_navigation_item(
                 renderer, font, (float)width * 0.84f, item_y, 34.0f,
@@ -409,6 +417,16 @@ void render_frame(SDL_Renderer *renderer, TTF_Font *font) {
             );
             break;
         case GAME_MODE_STATISTICS:
+            render_text(
+                renderer,
+                font,
+                gameState.statisticsParams.source == TELEMETRY_SOURCE_CURRENT_RUN
+                    ? "Source: current run"
+                    : "Source: example.csv",
+                790.0f,
+                20.0f,
+                COLOR_TEXT
+            );
             render_statistics_window(renderer, font);
             break;
         default:

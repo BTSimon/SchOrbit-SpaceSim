@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "../../headers/debugmalloc.h"
 
 /*
@@ -33,51 +34,81 @@ int init_telemetry(void) {
     return 0;
 }
 
-DataLine *parseLine(char *line) {
-    DataLine *returnLine;
+static int parseLine(const char *line, DataLine *returnLine) {
     if (sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf", 
-            returnLine->timestamp, 
-            returnLine->acceleration, 
-            returnLine->mass, 
-            returnLine->altitude, 
-            returnLine->speed,
-            returnLine->thrust) == 6) {
-        sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf", 
-            returnLine->timestamp, 
-            returnLine->acceleration, 
-            returnLine->mass, 
-            returnLine->altitude, 
-            returnLine->speed,
-            returnLine->thrust);
-    } else {
-        return NULL;
+            &returnLine->timestamp,
+            &returnLine->acceleration,
+            &returnLine->mass,
+            &returnLine->altitude,
+            &returnLine->speed,
+            &returnLine->thrust) == 6) {
+        return 0;
     }
-    return returnLine;
+    else {
+        return 500;
+    }
 }
 
-DataLine *open_telemetry(int *sizeOf) {
+static DataLine *open_telemetry(int *sizeOf) {
+    if (sizeOf == NULL) {
+        return NULL;
+    }
+    *sizeOf = 0;
+
     FILE *file = fopen("example.csv", "r");
     if (file == NULL) {
-        //recordsCount = NULL;
-        return;
+        return NULL;
     }    
 
     char buff[512];
     int builtRecordSize = 0;
-    DataLine *builtRecords = malloc(sizeof(DataLine) * builtRecordSize);
-    while (fgets(buff, sizeof(buff), file) != NULL)
-    {
-        DataLine *parsedRecord = parseLine(buff);
-        if (parsedRecord != NULL) {
-            builtRecordSize++;
-            DataLine *ptr = realloc(builtRecords, sizeof(DataLine)*builtRecordSize);
-            if (ptr == NULL) {
+    int capacity = 0;
+    DataLine *builtRecords = NULL;
+    while (fgets(buff, sizeof(buff), file) != NULL) {
+        DataLine line;
+        if (parseLine(buff, &line) == 0) {
+            if (builtRecordSize == INT_MAX) {
+                free(builtRecords);
+                fclose(file);
                 return NULL;
             }
-            builtRecords = ptr;
-            builtRecords[builtRecordSize-1] = *parsedRecord;
+
+            if (builtRecordSize == capacity) {
+                int new_capacity = capacity == 0 ? 64 : capacity;
+                if (capacity != 0) {
+                    new_capacity = capacity > INT_MAX / 2
+                        ? INT_MAX
+                        : capacity * 2;
+                }
+
+                DataLine *ptr = realloc(
+                    builtRecords,
+                    sizeof(*builtRecords) * (size_t)new_capacity
+                );
+                if (ptr == NULL) {
+                    free(builtRecords);
+                    fclose(file);
+                    return NULL;
+                }
+                builtRecords = ptr;
+                capacity = new_capacity;
+            }
+
+            builtRecords[builtRecordSize++] = line;
         } 
     }
+
+    if (ferror(file)) {
+        free(builtRecords);
+        fclose(file);
+        return NULL;
+    }
+
+    if (fclose(file) != 0) {
+        free(builtRecords);
+        return NULL;
+    }
+
     *sizeOf = builtRecordSize;
     return builtRecords;
 }
@@ -132,25 +163,66 @@ int save_telemetry(void) {
     return close_result == 0 ? 0 : 500;
 }
 
-double *create_record_array(DataType recordType, int *recordSize) {
-    memoryRecords = open_telemetry(recordSize);
-    double *returnArray = malloc(sizeof(double)*(*recordSize));
-    if (returnArray == NULL) {
+static double get_record_value(const DataLine *record, DataType recordType) {
+    switch (recordType) {
+        case TIMESTAMP:     return record->timestamp;
+        case MASS:          return record->mass;
+        case ACCELERATION:  return record->acceleration;
+        case ALTITUDE:      return record->altitude;
+        case SPEED:         return record->speed;
+        case THRUST:        return record->thrust;
+        default:            return 0.0;
+    }
+}
+
+static int is_valid_record_type(DataType recordType) {
+    return recordType >= TIMESTAMP && recordType <= THRUST;
+}
+
+double *create_record_array(
+    DataType recordType,
+    int *recordSize,
+    TelemetrySource source
+) {
+    if (recordSize == NULL) {
         return NULL;
     }
-    for (int i = 0; i<memoryRecordsCount; i++) {
-        switch (recordType) {
-            case TIMESTAMP:     returnArray[i] = memoryRecords[i].timestamp; break;
-            case MASS:          returnArray[i] = memoryRecords[i].mass; break;
-            case ACCELERATION:  returnArray[i] = memoryRecords[i].acceleration; break;
-            case ALTITUDE:      returnArray[i] = memoryRecords[i].altitude; break;
-            case SPEED:         returnArray[i] = memoryRecords[i].speed; break;
-            case THRUST:        returnArray[i] = memoryRecords[i].thrust; break;
-            default:
-                free(returnArray);
-                *recordSize = 0;
-                return NULL;
-        }
+
+    *recordSize = 0;
+    if (!is_valid_record_type(recordType)) {
+        return NULL;
     }
+
+    const DataLine *source_records = memoryRecords;
+    int source_count = memoryRecordsCount;
+    DataLine *file_records = NULL;
+
+    if (source == TELEMETRY_SOURCE_EXAMPLE_FILE) {
+        file_records = open_telemetry(&source_count);
+        if (file_records == NULL) {
+            return NULL;
+        }
+        source_records = file_records;
+    } else if (source != TELEMETRY_SOURCE_CURRENT_RUN) {
+        return NULL;
+    }
+
+    if (source_count <= 0 || source_records == NULL) {
+        free(file_records);
+        return NULL;
+    }
+
+    double *returnArray = malloc(sizeof(*returnArray) * (size_t)source_count);
+    if (returnArray == NULL) {
+        free(file_records);
+        return NULL;
+    }
+
+    for (int i = 0; i < source_count; ++i) {
+        returnArray[i] = get_record_value(&source_records[i], recordType);
+    }
+
+    *recordSize = source_count;
+    free(file_records);
     return returnArray;
 }

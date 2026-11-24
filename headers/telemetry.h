@@ -20,12 +20,22 @@ typedef enum {
     ACCELERATION,
     ALTITUDE,
     SPEED,
-    THRUST
+    THRUST,
+    DATA_NONE
 } DataType;
+
+typedef enum {
+    TELEMETRY_SOURCE_CURRENT_RUN,
+    TELEMETRY_SOURCE_EXAMPLE_FILE
+} TelemetrySource;
 
 int init_telemetry(void);
 int record_telemetry(DataLine dataEntry);
 int save_telemetry(void);
-double *create_record_array(DataType recordType, int *recordSize);
+double *create_record_array(
+    DataType recordType,
+    int *recordSize,
+    TelemetrySource source
+);
 
 #endif

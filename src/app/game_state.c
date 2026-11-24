@@ -36,6 +36,8 @@ void init_gamestate(void) {
 
     gameState.statisticsParams.x_axis = TIMESTAMP;
     gameState.statisticsParams.y_axis = ALTITUDE;
+    gameState.statisticsParams.y2_axis = THRUST;
+    gameState.statisticsParams.source = TELEMETRY_SOURCE_CURRENT_RUN;
     gameState.statisticsParams.graph_changed = false;
 }
 
@@ -55,14 +57,18 @@ void get_component_properties(void) {
 }
 
 DataType graph_axis_next(DataType current, int jump) {
-    DataType types[] = {TIMESTAMP, MASS, ACCELERATION, ALTITUDE, SPEED, THRUST};
+    const DataType types[] = {
+        TIMESTAMP, MASS, ACCELERATION, ALTITUDE, SPEED, THRUST, DATA_NONE
+    };
+    const int type_count = (int)(sizeof(types) / sizeof(types[0]));
     int currentIndex = 0;
-    for (int i = 0; i<6; i++) {
+    for (int i = 0; i < type_count; i++) {
         if (types[i] == current) {
             currentIndex = i;
+            break;
         }
     }
-    return types[((currentIndex+jump)%6 + 6) % 6];
+    return types[((currentIndex + jump) % type_count + type_count) % type_count];
 }
 
 

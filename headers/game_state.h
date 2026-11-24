@@ -46,6 +46,8 @@ typedef struct {
 typedef struct {
     DataType x_axis;
     DataType y_axis; 
+    DataType y2_axis;
+    TelemetrySource source;
     bool graph_changed;
 } StatisticsParams;
 
