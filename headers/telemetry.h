@@ -29,9 +29,14 @@ typedef enum {
     TELEMETRY_SOURCE_EXAMPLE_FILE
 } TelemetrySource;
 
-int init_telemetry(void);
-int record_telemetry(DataLine dataEntry);
-int save_telemetry(void);
+typedef enum {
+    TELEMETRY_STATUS_OK = 0,
+    TELEMETRY_STATUS_ERROR = 1
+} TelemetryStatus;
+
+TelemetryStatus init_telemetry(void);
+TelemetryStatus record_telemetry(DataLine dataEntry);
+TelemetryStatus save_telemetry(void);
 double *create_record_array(
     DataType recordType,
     int *recordSize,

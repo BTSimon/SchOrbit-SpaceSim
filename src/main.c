@@ -1,4 +1,6 @@
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "../headers/game.h"
 #include "../headers/window.h"
@@ -19,11 +21,12 @@ bool running = true;
 
 int main(void)
 {
-    if (init_window() > 0) {
-        return 1;
+    if (init_window() != APP_STATUS_OK) {
+        return EXIT_FAILURE;
     }
-    if (init_game() > 0) {
-        return 1;
+    if (init_game() != APP_STATUS_OK) {
+        exit_window();
+        return EXIT_FAILURE;
     }
 
     while (running) {
@@ -31,10 +34,12 @@ int main(void)
     }
 
     exit_window();
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 void quit_game(void) {
-    save_telemetry();
+    if (save_telemetry() != TELEMETRY_STATUS_OK) {
+        fputs("The telemetry recording may be incomplete.\n", stderr);
+    }
     running = false;
 }

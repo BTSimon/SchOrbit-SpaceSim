@@ -21,10 +21,11 @@ static SDL_Renderer *renderer;
 static TTF_Font *font;
 static bool ttf_initialized;
 
-int init_window(void) {
+AppStatus init_window(void) {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("SDL initialization failed: %s", SDL_GetError());
-        return 500;
+        exit_window();
+        return APP_STATUS_ERROR;
     }
 
     if (!SDL_CreateWindowAndRenderer(
@@ -36,13 +37,13 @@ int init_window(void) {
             &renderer)) {
         SDL_Log("Window creation failed: %s", SDL_GetError());
         exit_window();
-        return 500;
+        return APP_STATUS_ERROR;
     }
 
     if (!TTF_Init()) {
         SDL_Log("SDL_ttf initialization failed: %s", SDL_GetError());
         exit_window();
-        return 500;
+        return APP_STATUS_ERROR;
     }
     ttf_initialized = true;
 
@@ -51,7 +52,7 @@ int init_window(void) {
     if (executable_directory == NULL) {
         SDL_Log("Could not locate the executable directory: %s", SDL_GetError());
         exit_window();
-        return 500;
+        return APP_STATUS_ERROR;
     }
 
     const int font_path_length = snprintf(
@@ -64,17 +65,17 @@ int init_window(void) {
     if (font_path_length < 0 || font_path_length >= (int)sizeof(font_path)) {
         SDL_Log("Font path is too long");
         exit_window();
-        return 500;
+        return APP_STATUS_ERROR;
     }
 
     font = TTF_OpenFont(font_path, FONT_SIZE);
     if (font == NULL) {
         SDL_Log("Failed to load font '%s': %s", font_path, SDL_GetError());
         exit_window();
-        return 500;
+        return APP_STATUS_ERROR;
     }
 
-    return 0;
+    return APP_STATUS_OK;
 }
 
 void exit_window(void) {

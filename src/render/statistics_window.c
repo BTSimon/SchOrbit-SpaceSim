@@ -328,7 +328,7 @@ void render_graph_lines(SDL_Renderer *renderer) {
         SDL_RenderLine(renderer, points_1[i].x, points_1[i].y, points_1[i+1].x, points_1[i+1].y);
     } 
     SDL_SetRenderDrawColor(renderer, COLOR_GRAPH_POINT2.r, COLOR_GRAPH_POINT2.g, COLOR_GRAPH_POINT2.b, COLOR_GRAPH_POINT2.a);
-    
+
     for (int i = 0; points_2 != NULL && i<points_count-1; i++) {
         SDL_RenderLine(renderer, points_2[i].x, points_2[i].y, points_2[i+1].x, points_2[i+1].y);
     } 
@@ -343,8 +343,9 @@ void render_statistics_window(SDL_Renderer *renderer, TTF_Font *font) {
     int output_width = 1000;
     int output_height = 600;
     SDL_GetCurrentRenderOutputSize(renderer, &output_width, &output_height);
-    render_graph_lines(renderer);
     render_graph_baselines(renderer, font);
+    render_graph_lines(renderer);
+    
     
 }
 

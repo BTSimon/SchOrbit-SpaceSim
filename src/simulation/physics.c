@@ -3,6 +3,8 @@
 #include "../../headers/telemetry.h"
 
 #include <math.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 Vector calculate_gravity(double distance_from_earth) {
     Vector g_force;
@@ -117,7 +119,15 @@ void physics_loop(double delta_time) {
         current_entry.speed = gameState.shipParams.speed.y;
         current_entry.thrust = gameState.thrust_level;
 
-        record_telemetry(current_entry);
+        static bool telemetry_failure_reported;
+        if (record_telemetry(current_entry) != TELEMETRY_STATUS_OK &&
+            !telemetry_failure_reported) {
+            fputs(
+                "physics: telemetry recording stopped after an error\n",
+                stderr
+            );
+            telemetry_failure_reported = true;
+        }
     }
 
 

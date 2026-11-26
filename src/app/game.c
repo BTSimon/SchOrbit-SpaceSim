@@ -9,19 +9,19 @@ static Uint64 previous_physics_counter;
 static Uint64 performance_frequency;
 static double physics_accumulator;
 
-int init_game(void) {
+AppStatus init_game(void) {
     init_gamestate();
     get_component_properties();
 
-    if (init_telemetry() != 0) {
-        return 1;
+    if (init_telemetry() != TELEMETRY_STATUS_OK) {
+        return APP_STATUS_ERROR;
     }
 
     performance_frequency = SDL_GetPerformanceFrequency();
     previous_physics_counter = SDL_GetPerformanceCounter();
     physics_accumulator = 0.0;
 
-    return 0;
+    return APP_STATUS_OK;
 }
 
 static void advance_physics_clock(void) {

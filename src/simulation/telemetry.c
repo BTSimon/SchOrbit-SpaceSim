@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdbool.h>
 #include "../../headers/debugmalloc.h"
 
 /*
@@ -16,37 +17,46 @@ static FILE *records;
 static DataLine *memoryRecords;
 static int memoryRecordsCapacity = 0;
 static int memoryRecordsCount;
+static bool memory_recording_failed;
 
-int init_telemetry(void) {
+TelemetryStatus init_telemetry(void) {
     time_t now = time(NULL);
+    if (now == (time_t)-1) {
+        fprintf(stderr, "telemetry: could not read the system clock\n");
+        return TELEMETRY_STATUS_ERROR;
+    }
+
     struct tm *t = localtime(&now);
+    if (t == NULL) {
+        fprintf(stderr, "telemetry: could not convert the system time\n");
+        return TELEMETRY_STATUS_ERROR;
+    }
 
     char filename[64];
 
-    strftime(filename, sizeof(filename), "record_%Y-%m-%d_%H-%M-%S.csv", t);
+    if (strftime(filename, sizeof(filename), "record_%Y-%m-%d_%H-%M-%S.csv", t) == 0) {
+        fprintf(stderr, "telemetry: could not create the recording filename\n");
+        return TELEMETRY_STATUS_ERROR;
+    }
 
     records = fopen(filename, "w");
-    
     if (records == NULL) {
-        return 500;
+        fprintf(stderr, "telemetry: could not open '%s': ", filename);
+        perror("telemetry");
+        return TELEMETRY_STATUS_ERROR;
     }
 
-    return 0;
+    return TELEMETRY_STATUS_OK;
 }
 
-static int parseLine(const char *line, DataLine *returnLine) {
-    if (sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf", 
-            &returnLine->timestamp,
-            &returnLine->acceleration,
-            &returnLine->mass,
-            &returnLine->altitude,
-            &returnLine->speed,
-            &returnLine->thrust) == 6) {
-        return 0;
-    }
-    else {
-        return 500;
-    }
+static bool parse_line(const char *line, DataLine *record) {
+    return sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf",
+        &record->timestamp,
+        &record->acceleration,
+        &record->mass,
+        &record->altitude,
+        &record->speed,
+        &record->thrust) == 6;
 }
 
 static DataLine *open_telemetry(int *sizeOf) {
@@ -66,7 +76,7 @@ static DataLine *open_telemetry(int *sizeOf) {
     DataLine *builtRecords = NULL;
     while (fgets(buff, sizeof(buff), file) != NULL) {
         DataLine line;
-        if (parseLine(buff, &line) == 0) {
+        if (parse_line(buff, &line)) {
             if (builtRecordSize == INT_MAX) {
                 free(builtRecords);
                 fclose(file);
@@ -113,20 +123,30 @@ static DataLine *open_telemetry(int *sizeOf) {
     return builtRecords;
 }
 
-int record_telemetry(DataLine dataEntry) {
-    if (memoryRecordsCount == memoryRecordsCapacity) {
+TelemetryStatus record_telemetry(DataLine dataEntry) {
+    if (memory_recording_failed) {
+        return TELEMETRY_STATUS_ERROR;
+    }
 
-        int new_capacity = memoryRecordsCapacity;
-        if (new_capacity == 0) {
-            new_capacity = 1;
-        } else {
-            new_capacity = new_capacity*2;
+    if (memoryRecordsCount == memoryRecordsCapacity) {
+        if (memoryRecordsCapacity > INT_MAX / 2) {
+            memory_recording_failed = true;
+            return TELEMETRY_STATUS_ERROR;
+        }
+
+        int new_capacity = memoryRecordsCapacity == 0
+            ? 1
+            : memoryRecordsCapacity * 2;
+        if ((size_t)new_capacity > SIZE_MAX / sizeof(*memoryRecords)) {
+            memory_recording_failed = true;
+            return TELEMETRY_STATUS_ERROR;
         }
 
         DataLine *memptr = realloc(memoryRecords, sizeof(*memoryRecords) * new_capacity);
 
         if (memptr == NULL) {
-            return 500;
+            memory_recording_failed = true;
+            return TELEMETRY_STATUS_ERROR;
         }
 
         memoryRecords = memptr;
@@ -134,33 +154,53 @@ int record_telemetry(DataLine dataEntry) {
     }
 
     memoryRecords[memoryRecordsCount++] = dataEntry;
-    return 0;
+    return TELEMETRY_STATUS_OK;
 }
 
-int save_telemetry(void) {
+TelemetryStatus save_telemetry(void) {
     if (records == NULL) {
-        return 500;
+        fprintf(stderr, "telemetry: no recording file is open\n");
+        free(memoryRecords);
+        memoryRecords = NULL;
+        memoryRecordsCapacity = 0;
+        memoryRecordsCount = 0;
+        memory_recording_failed = false;
+        return TELEMETRY_STATUS_ERROR;
     }
-    fprintf(records, "%s,", "time");
-    fprintf(records, "%s,", "acceleration");
-    fprintf(records, "%s,", "mass");
-    fprintf(records, "%s,", "altitude");
-    fprintf(records, "%s,", "speed");
-    fprintf(records, "%s\n", "thrust");
 
-    for (int rec = 0; rec < memoryRecordsCount; rec++) {
-        fprintf(records, "%f,", memoryRecords[rec].timestamp);
-        fprintf(records, "%f,", memoryRecords[rec].acceleration);
-        fprintf(records, "%f,", memoryRecords[rec].mass);
-        fprintf(records, "%f,", memoryRecords[rec].altitude);
-        fprintf(records, "%f,", memoryRecords[rec].speed);
-        fprintf(records, "%f\n", memoryRecords[rec].thrust);
+    bool write_ok = fprintf(
+        records,
+        "time,acceleration,mass,altitude,speed,thrust\n"
+    ) >= 0;
+
+    for (int rec = 0; write_ok && rec < memoryRecordsCount; ++rec) {
+        write_ok = fprintf(
+            records,
+            "%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
+            memoryRecords[rec].timestamp,
+            memoryRecords[rec].acceleration,
+            memoryRecords[rec].mass,
+            memoryRecords[rec].altitude,
+            memoryRecords[rec].speed,
+            memoryRecords[rec].thrust
+        ) >= 0;
     }
 
     int close_result = fclose(records);
     records = NULL;
     free(memoryRecords);
-    return close_result == 0 ? 0 : 500;
+    memoryRecords = NULL;
+    memoryRecordsCapacity = 0;
+    memoryRecordsCount = 0;
+    memory_recording_failed = false;
+
+    if (!write_ok || close_result != 0) {
+        fprintf(stderr, "telemetry: failed while writing the recording file: ");
+        perror("telemetry");
+        return TELEMETRY_STATUS_ERROR;
+    }
+
+    return TELEMETRY_STATUS_OK;
 }
 
 static double get_record_value(const DataLine *record, DataType recordType) {
