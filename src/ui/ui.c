@@ -18,6 +18,9 @@ UI_ACTIONS ui_handle_event(SDL_Event *event) {
             return UI_ACTION_GRAPH2_INCREASE;
         case SDLK_S:
             return UI_ACTION_GRAPH2_DECREASE;
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:
+            return UI_ACTION_CONFIRM_DESIGN;
         case SDLK_1:
             return UI_ACTION_SHOW_DESIGN;
         case SDLK_2:

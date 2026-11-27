@@ -35,6 +35,7 @@ typedef enum {
 } TelemetryStatus;
 
 TelemetryStatus init_telemetry(void);
+TelemetryStatus restart_telemetry(void);
 TelemetryStatus record_telemetry(DataLine dataEntry);
 TelemetryStatus save_telemetry(void);
 double *create_record_array(

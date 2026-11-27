@@ -24,6 +24,8 @@ void init_gamestate(void) {
     gameState.shipComponents.nose = NOSE_SHARP;
     gameState.shipComponents.body = BODY_LIGHTWEIGHT;
     gameState.shipComponents.thruster = THRUSTER_EFFICIENT;
+    gameState.designParams.selected = NOSE;
+    gameState.designParams.draft = gameState.shipComponents;
 
     gameState.shipParams.mass = 0;
 
@@ -42,18 +44,16 @@ void init_gamestate(void) {
 }
 
 void get_component_properties(void) {
-    gameState.shipParams.mass += get_nose_properties(gameState.shipComponents.nose).mass;
+    const NoseProperties nose = get_nose_properties(gameState.shipComponents.nose);
+    const BodyProperties body = get_body_properties(gameState.shipComponents.body);
+    const ThrusterProperties thruster = get_thruster_properties(gameState.shipComponents.thruster);
 
-    gameState.shipParams.mass += get_body_properties(gameState.shipComponents.body).mass;
-    gameState.shipParams.mass += get_thruster_properties(gameState.shipComponents.thruster).mass;
-
-    gameState.shipParams.all_drag.drag_up = get_nose_properties(gameState.shipComponents.nose).drag_properties;
-    gameState.shipParams.all_drag.drag_down = get_thruster_properties(gameState.shipComponents.thruster).drag_properties;
-
-    gameState.shipParams.fuel += get_body_properties(gameState.shipComponents.body).fuel_storage;
-
-    gameState.shipParams.thrust += get_thruster_properties(gameState.shipComponents.thruster).thrust;
-    gameState.shipParams.propellant_flow_rate += get_thruster_properties(gameState.shipComponents.thruster).propellant_flow_rate;
+    gameState.shipParams.mass = nose.mass + body.mass + thruster.mass;
+    gameState.shipParams.fuel = body.fuel_storage;
+    gameState.shipParams.thrust = thruster.thrust;
+    gameState.shipParams.propellant_flow_rate = thruster.propellant_flow_rate;
+    gameState.shipParams.all_drag.drag_up = nose.drag_properties;
+    gameState.shipParams.all_drag.drag_down = thruster.drag_properties;
 }
 
 DataType graph_axis_next(DataType current, int jump) {

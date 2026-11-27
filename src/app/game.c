@@ -24,6 +24,31 @@ AppStatus init_game(void) {
     return APP_STATUS_OK;
 }
 
+AppStatus start_new_flight(void) {
+    if (restart_telemetry() != TELEMETRY_STATUS_OK) {
+        return APP_STATUS_ERROR;
+    }
+
+    gameState.shipComponents = gameState.designParams.draft;
+    gameState.shipParams.position = (Coordinates){0.0, 0.0};
+    gameState.shipParams.realPosition = (Coordinates){0.0, 0.0};
+    gameState.shipParams.acceleration = (Vector){0.0, 0.0};
+    gameState.shipParams.speed = (Vector){0.0, 0.0};
+    gameState.shipParams.elapsed_time = 0.0;
+    get_component_properties();
+
+    gameState.thrust_level = 0.0;
+    gameState.paused = false;
+    gameState.gameMode = GAME_MODE_TEST;
+    gameState.designParams.draft = gameState.shipComponents;
+    gameState.statisticsParams.source = TELEMETRY_SOURCE_CURRENT_RUN;
+    gameState.statisticsParams.graph_changed = true;
+
+    physics_accumulator = 0.0;
+    previous_physics_counter = SDL_GetPerformanceCounter();
+    return APP_STATUS_OK;
+}
+
 static void advance_physics_clock(void) {
     if (performance_frequency == 0) {
         return;

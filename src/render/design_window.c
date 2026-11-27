@@ -1,6 +1,62 @@
 #include "../../headers/window_renderers.h"
+#include "../../headers/game_state.h"
+
+#include <stdio.h>
 
 static const SDL_Color COLOR_TEXT = {255, 255, 255, 255};
+static const SDL_Color COLOR_MUTED = {133, 170, 193, 255};
+static const SDL_Color COLOR_SELECTED = {35, 103, 132, 220};
+static const SDL_Color COLOR_SELECTED_BORDER = {71, 205, 224, 255};
+
+static void render_component_row(
+    SDL_Renderer *renderer,
+    TTF_Font *font,
+    float x,
+    float y,
+    const char *part_name,
+    const char *design_name,
+    bool selected
+) {
+    const SDL_FRect row = {x, y, 292.0f, 62.0f};
+    const SDL_Color fill = selected
+        ? COLOR_SELECTED
+        : (SDL_Color){9, 31, 52, 210};
+    const SDL_Color border = selected
+        ? COLOR_SELECTED_BORDER
+        : (SDL_Color){29, 66, 91, 255};
+
+    SDL_SetRenderDrawColor(renderer, fill.r, fill.g, fill.b, fill.a);
+    SDL_RenderFillRect(renderer, &row);
+    SDL_SetRenderDrawColor(renderer, border.r, border.g, border.b, border.a);
+    SDL_RenderRect(renderer, &row);
+
+    render_text(renderer, font, part_name, x + 14.0f, y + 8.0f, COLOR_MUTED);
+    render_text(renderer, font, design_name, x + 14.0f, y + 32.0f, COLOR_TEXT);
+}
+
+static void render_draft_summary(SDL_Renderer *renderer, TTF_Font *font) {
+    const NoseProperties nose = get_nose_properties(gameState.designParams.draft.nose);
+    const BodyProperties body = get_body_properties(gameState.designParams.draft.body);
+    const ThrusterProperties thruster = get_thruster_properties(gameState.designParams.draft.thruster);
+    const double dry_mass = nose.mass + body.mass + thruster.mass;
+    char value[96];
+
+    const SDL_FRect panel = {680.0f, 100.0f, 286.0f, 234.0f};
+    SDL_SetRenderDrawColor(renderer, 9, 31, 52, 220);
+    SDL_RenderFillRect(renderer, &panel);
+    SDL_SetRenderDrawColor(renderer, 29, 66, 91, 255);
+    SDL_RenderRect(renderer, &panel);
+    render_text(renderer, font, "DRAFT FLIGHT DATA", 698.0f, 116.0f, COLOR_SELECTED_BORDER);
+
+    snprintf(value, sizeof(value), "Dry mass: %.0f kg", dry_mass);
+    render_text(renderer, font, value, 698.0f, 154.0f, COLOR_TEXT);
+    snprintf(value, sizeof(value), "Fuel capacity: %.0f kg", body.fuel_storage);
+    render_text(renderer, font, value, 698.0f, 188.0f, COLOR_TEXT);
+    snprintf(value, sizeof(value), "Thrust: %.0f N", thruster.thrust);
+    render_text(renderer, font, value, 698.0f, 222.0f, COLOR_TEXT);
+    snprintf(value, sizeof(value), "Flow: %.1f kg/s", thruster.propellant_flow_rate);
+    render_text(renderer, font, value, 698.0f, 256.0f, COLOR_TEXT);
+}
 
 static void render_blueprint_background(
     SDL_Renderer *renderer,
@@ -53,13 +109,24 @@ void render_design_window(
 ) {
     render_blueprint_background(renderer, width, height);
     render_text(renderer, font, "Ship Design", 20.0f, 20.0f, COLOR_TEXT);
-    render_text(
-        renderer,
-        font,
-        "Ship design workspace",
-        20.0f,
-        55.0f,
-        COLOR_TEXT
+    render_text(renderer, font, "Choose a part, adjust its design, then confirm to launch", 20.0f, 55.0f, COLOR_MUTED);
+
+    render_component_row(
+        renderer, font, 24.0f, 104.0f, "NOSE",
+        gameState.designParams.draft.nose == NOSE_SHARP ? "Sharp" : "Standard",
+        gameState.designParams.selected == NOSE
     );
+    render_component_row(
+        renderer, font, 24.0f, 178.0f, "BODY",
+        gameState.designParams.draft.body == BODY_LIGHTWEIGHT ? "Lightweight" : "Standard",
+        gameState.designParams.selected == BODY
+    );
+    render_component_row(
+        renderer, font, 24.0f, 252.0f, "THRUSTER",
+        gameState.designParams.draft.thruster == THRUSTER_EFFICIENT ? "Efficient" : "Fast",
+        gameState.designParams.selected == THRUSTER
+    );
+
     render_ship(renderer, ship_position);
+    render_draft_summary(renderer, font);
 }

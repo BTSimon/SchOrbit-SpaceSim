@@ -31,6 +31,7 @@ typedef struct {
 
 typedef struct {
     Components selected;
+    ShipComponents draft;
 } DesignParams;
 
 typedef struct {

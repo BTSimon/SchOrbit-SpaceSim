@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <errno.h>
 #include "../../headers/debugmalloc.h"
 
 /*
@@ -18,6 +19,7 @@ static DataLine *memoryRecords;
 static int memoryRecordsCapacity = 0;
 static int memoryRecordsCount;
 static bool memory_recording_failed;
+static unsigned int recording_session_sequence;
 
 TelemetryStatus init_telemetry(void) {
     time_t now = time(NULL);
@@ -32,21 +34,48 @@ TelemetryStatus init_telemetry(void) {
         return TELEMETRY_STATUS_ERROR;
     }
 
-    char filename[64];
-
-    if (strftime(filename, sizeof(filename), "record_%Y-%m-%d_%H-%M-%S.csv", t) == 0) {
+    char timestamp[32];
+    if (strftime(timestamp, sizeof(timestamp), "%Y-%m-%d_%H-%M-%S", t) == 0) {
         fprintf(stderr, "telemetry: could not create the recording filename\n");
         return TELEMETRY_STATUS_ERROR;
     }
 
-    records = fopen(filename, "w");
-    if (records == NULL) {
-        fprintf(stderr, "telemetry: could not open '%s': ", filename);
-        perror("telemetry");
-        return TELEMETRY_STATUS_ERROR;
+    char filename[64];
+    for (unsigned int attempt = 0; attempt < 1000; ++attempt) {
+        const unsigned int sequence = recording_session_sequence++;
+        const int filename_length = snprintf(
+            filename,
+            sizeof(filename),
+            "record_%s_%u.csv",
+            timestamp,
+            sequence
+        );
+        if (filename_length < 0 || filename_length >= (int)sizeof(filename)) {
+            fprintf(stderr, "telemetry: recording filename is too long\n");
+            return TELEMETRY_STATUS_ERROR;
+        }
+
+        errno = 0;
+        records = fopen(filename, "wx");
+        if (records != NULL) {
+            return TELEMETRY_STATUS_OK;
+        }
+        if (errno != EEXIST) {
+            fprintf(stderr, "telemetry: could not open '%s': ", filename);
+            perror("telemetry");
+            return TELEMETRY_STATUS_ERROR;
+        }
     }
 
-    return TELEMETRY_STATUS_OK;
+    fprintf(stderr, "telemetry: could not create a unique recording filename\n");
+    return TELEMETRY_STATUS_ERROR;
+}
+
+TelemetryStatus restart_telemetry(void) {
+    if (records != NULL) {
+        (void)save_telemetry();
+    }
+    return init_telemetry();
 }
 
 static bool parse_line(const char *line, DataLine *record) {

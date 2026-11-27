@@ -326,15 +326,19 @@ static void render_window_navigation(
     switch (game_mode) {
         case GAME_MODE_DESIGN:
             render_navigation_item(
-                renderer, font, (float)width * 0.45f, item_y, 48.0f,
-                "SPACE", "Pause", false
+                renderer, font, (float)width * 0.39f, item_y, 54.0f,
+                "LEFT/RT", "Select part", false
             );
             render_navigation_item(
-                renderer, font, (float)width * 0.62f, item_y, 54.0f,
-                "UP/DN", "Thrust", false
+                renderer, font, (float)width * 0.535f, item_y, 54.0f,
+                "UP/DN", "Change design", false
             );
             render_navigation_item(
-                renderer, font, (float)width * 0.84f, item_y, 34.0f,
+                renderer, font, (float)width * 0.70f, item_y, 54.0f,
+                "ENTER", "Confirm", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.87f, item_y, 34.0f,
                 "ESC", "Quit", false
             );
             break;
