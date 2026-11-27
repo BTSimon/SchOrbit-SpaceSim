@@ -12,6 +12,11 @@ typedef enum {
     GAME_MODE_STATISTICS
 } GameMode;
 
+typedef enum {
+    NOSE,
+    BODY,
+    THRUSTER
+} Components;
 
 typedef struct {
     Drag drag_up;
@@ -23,6 +28,10 @@ typedef struct {
     BodyType body;
     ThrusterType thruster;
 } ShipComponents;
+
+typedef struct {
+    Components selected;
+} DesignParams;
 
 typedef struct {
     Coordinates position;
@@ -56,7 +65,7 @@ typedef struct {
     ShipParams shipParams;
     ShipComponents shipComponents;
     StatisticsParams statisticsParams;
-
+    DesignParams designParams;
 
     bool paused;
     double thrust_level;

@@ -36,6 +36,16 @@ void event_handler(UI_ACTIONS action) {
     //events based on gamestate
     switch (gameState.gameMode) {
         case GAME_MODE_DESIGN:
+            switch (action) {
+            case UI_ACTION_SOURCE_NEXT:
+                select_next_component(gameState.designParams.selected);
+                break;
+            case UI_ACTION_SOURCE_PREVIOUS:
+                break;
+            
+            default:
+                break;
+            }
             break;
         case GAME_MODE_STATISTICS:
             switch (action)
