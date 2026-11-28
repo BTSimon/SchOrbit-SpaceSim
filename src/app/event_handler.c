@@ -14,13 +14,13 @@ static void change_selected_design(int step) {
     ShipComponents *draft = &gameState.designParams.draft;
     switch (gameState.designParams.selected) {
         case NOSE:
-            draft->nose = (NoseType)wrap_index((int)draft->nose + step, 2);
+            draft->nose = (NoseType)wrap_index((int)draft->nose + step, NOSE_TYPE_COUNT);
             break;
         case BODY:
-            draft->body = (BodyType)wrap_index((int)draft->body + step, 2);
+            draft->body = (BodyType)wrap_index((int)draft->body + step, BODY_TYPE_COUNT);
             break;
         case THRUSTER:
-            draft->thruster = (ThrusterType)wrap_index((int)draft->thruster + step, 2);
+            draft->thruster = (ThrusterType)wrap_index((int)draft->thruster + step, THRUSTER_TYPE_COUNT);
             break;
     }
 }
@@ -133,6 +133,16 @@ void event_handler(UI_ACTIONS action) {
                 case UI_ACTION_DECREASE:
                     if (gameState.thrust_level > 0.0) {
                         gameState.thrust_level -= 0.05;
+                    }
+                    break;
+                case UI_ACTION_SOURCE_NEXT:
+                    if (gameState.simulation_speed < 8.0) {
+                        gameState.simulation_speed *= 2.0;
+                    }
+                    break;
+                case UI_ACTION_SOURCE_PREVIOUS:
+                    if (gameState.simulation_speed > 0.25) {
+                        gameState.simulation_speed *= 0.5;
                     }
                     break;
                 default:

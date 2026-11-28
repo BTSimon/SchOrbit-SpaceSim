@@ -344,33 +344,37 @@ static void render_window_navigation(
             break;
         case GAME_MODE_STATISTICS:
             render_navigation_item(
-                renderer, font, (float)width * 0.42f, item_y, 54.0f,
+                renderer, font, (float)width * 0.40f, item_y, 54.0f,
                 "UP/DN", "Graph 1 axis", false
             );
             render_navigation_item(
-                renderer, font, (float)width * 0.58f, item_y, 34.0f,
+                renderer, font, (float)width * 0.56f, item_y, 34.0f,
                 "W/S", "Graph 2 axis", false
             );
             render_navigation_item(
-                renderer, font, (float)width * 0.72f, item_y, 54.0f,
+                renderer, font, (float)width * 0.70f, item_y, 64.0f,
                 "LEFT/RT", "Data source", false
             );
             render_navigation_item(
-                renderer, font, (float)width * 0.84f, item_y, 34.0f,
+                renderer, font, (float)width * 0.88f, item_y, 34.0f,
                 "ESC", "Quit", false
             );
             break;
         case GAME_MODE_TEST:
             render_navigation_item(
-                renderer, font, (float)width * 0.45f, item_y, 48.0f,
+                renderer, font, (float)width * 0.40f, item_y, 48.0f,
                 "SPACE", "Pause", false
             );
             render_navigation_item(
-                renderer, font, (float)width * 0.62f, item_y, 54.0f,
+                renderer, font, (float)width * 0.56f, item_y, 54.0f,
                 "UP/DN", "Thrust", false
             );
             render_navigation_item(
-                renderer, font, (float)width * 0.84f, item_y, 34.0f,
+                renderer, font, (float)width * 0.68f, item_y, 64.0f,
+                "LEFT/RT", "Sim speed", false
+            );
+            render_navigation_item(
+                renderer, font, (float)width * 0.86f, item_y, 34.0f,
                 "ESC", "Quit", false
             );
             break;

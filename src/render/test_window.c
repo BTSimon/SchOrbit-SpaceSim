@@ -389,6 +389,8 @@ void render_test_window(
     int width,
     int height
 ) {
+    char speed_text[40];
+    snprintf(speed_text, sizeof(speed_text), "Simulation speed: %.2gx", gameState.simulation_speed);
     render_test_background(
         renderer,
         width,
@@ -397,6 +399,7 @@ void render_test_window(
         ship_position
     );
     render_text(renderer, font, "Test Run", 20.0f, 20.0f, COLOR_TEXT);
+    render_text(renderer, font, speed_text, 20.0f, 144.0f, COLOR_TEXT);
     render_ship(renderer, ship_position);
     render_statistics_values(renderer, font);
     render_flight_indicators(renderer, font, width, height);

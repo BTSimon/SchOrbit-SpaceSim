@@ -35,6 +35,7 @@ void init_gamestate(void) {
 
     gameState.paused = false;
     gameState.thrust_level = 0.0;
+    gameState.simulation_speed = 1.0;
 
     gameState.statisticsParams.x_axis = TIMESTAMP;
     gameState.statisticsParams.y_axis = ALTITUDE;
@@ -51,7 +52,9 @@ void get_component_properties(void) {
     gameState.shipParams.mass = nose.mass + body.mass + thruster.mass;
     gameState.shipParams.fuel = body.fuel_storage;
     gameState.shipParams.thrust = thruster.thrust;
-    gameState.shipParams.propellant_flow_rate = thruster.propellant_flow_rate;
+    gameState.shipParams.propellant_flow_rate = thruster.specific_impulse > 0.0
+        ? thruster.thrust / (thruster.specific_impulse * STANDARD_GRAVITY_M_S2)
+        : 0.0;
     gameState.shipParams.all_drag.drag_up = nose.drag_properties;
     gameState.shipParams.all_drag.drag_down = thruster.drag_properties;
 }

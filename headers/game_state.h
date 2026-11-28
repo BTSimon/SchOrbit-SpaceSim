@@ -70,6 +70,7 @@ typedef struct {
 
     bool paused;
     double thrust_level;
+    double simulation_speed;
 } GameState;
 
 void init_gamestate(void);

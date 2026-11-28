@@ -8,33 +8,45 @@ typedef struct {
 
 typedef enum {
     NOSE_STANDARD,
-    NOSE_SHARP
+    NOSE_SHARP,
+    NOSE_BLUNT,
+    NOSE_TYPE_COUNT
 } NoseType;
 
 typedef enum {
     BODY_STANDARD,
-    BODY_LIGHTWEIGHT
+    BODY_LIGHTWEIGHT,
+    BODY_HEAVY,
+    BODY_TYPE_COUNT
 } BodyType;
 
 typedef enum {
-    THRUSTER_FAST,
-    THRUSTER_EFFICIENT
+    THRUSTER_HIGH_THRUST,
+    THRUSTER_EFFICIENT,
+    THRUSTER_BALANCED,
+    THRUSTER_HEAVY,
+    THRUSTER_TYPE_COUNT
 } ThrusterType;
 
+#define STANDARD_GRAVITY_M_S2 9.80665
+
 typedef struct {
+    const char *name;
     double mass;
     Drag drag_properties;
 } NoseProperties;
 
 typedef struct {
+    const char *name;
     double mass;
     double fuel_storage;
 } BodyProperties;
 
 typedef struct {
+    const char *name;
     double mass;
     double thrust; 
-    double propellant_flow_rate;
+    double specific_impulse;
     Drag drag_properties;
 } ThrusterProperties;
 

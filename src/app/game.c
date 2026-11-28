@@ -65,7 +65,7 @@ static void advance_physics_clock(void) {
         return;
     }
 
-    physics_accumulator += elapsed_seconds;
+    physics_accumulator += elapsed_seconds * gameState.simulation_speed;
     while (physics_accumulator >= PHYSICS_STEP_SECONDS) {
         physics_loop(PHYSICS_STEP_SECONDS);
         physics_accumulator -= PHYSICS_STEP_SECONDS;
